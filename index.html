@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cliente não oficial do Google Drive para Linux, escrito em Rust. Sincronização, off-line, compartilhamento, backup de pastas e integração com o gerenciador de arquivos.">
+<meta name="theme-color" content="#0b0f19">
+<meta property="og:title" content="GDrive Desktop — Google Drive nativo no Linux">
+<meta property="og:description" content="Cliente não oficial do Google Drive para Linux, escrito em Rust.">
+<meta property="og:image" content="assets/img/icon.png">
+<meta property="og:type" content="website">
+
+<title>GDrive Desktop — Cliente do Google Drive para Linux</title>
+
+<link rel="icon" type="image/png" href="assets/img/icon-128.png">
+<link rel="apple-touch-icon" href="assets/img/icon-128.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+      },
+      colors: {
+        gdrive: {
+          blue: "#4285f4",
+          green: "#34a853",
+          yellow: "#fbbc04",
+          red: "#ea4335",
+          purple: "#a142f4",
+        },
+      },
+      screens: { xs: "420px" },
+    },
+  },
+};
+</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body class="font-sans">
+
+<div id="scroll-progress"></div>
+<div class="spotlight" id="spotlight"></div>
+
+<a href="#hero" data-i18n="nav.skip"
+   class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-gdrive-blue focus:px-4 focus:py-2 focus:text-white">
+  Pular para o conteúdo
+</a>
+
+<!-- ===================== NAV ===================== -->
+<header id="nav" class="fixed inset-x-0 top-0 z-50 transition-all duration-300">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div id="nav-inner" class="mt-3 flex items-center justify-between gap-4 rounded-2xl border border-white/5 bg-[#0b0f19]/40 px-4 py-3 backdrop-blur-xl transition-all duration-300">
+      <a href="#hero" class="group flex items-center gap-2.5">
+        <img src="assets/img/icon-128.png" alt="GDrive Desktop" class="h-9 w-9 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+        <span class="font-display text-base font-bold tracking-tight text-white">GDrive <span class="text-slate-400">Desktop</span></span>
+      </a>
+
+      <nav class="hidden items-center gap-1 lg:flex" aria-label="Principal">
+        <a href="#features" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.features">Recursos</a>
+        <a href="#how" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.how">Como funciona</a>
+        <a href="#screens" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.screens">Telas</a>
+        <a href="#install" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.install">Instalar</a>
+        <a href="#cli" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.cli">CLI</a>
+        <a href="#faq" class="rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.faq">Perguntas</a>
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <span class="lang-pill" id="lang-pill"></span>
+          <button class="lang-btn" data-locale="pt-BR" aria-pressed="true">PT</button>
+          <button class="lang-btn" data-locale="en-US" aria-pressed="false">EN</button>
+        </div>
+        <a href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener"
+           class="btn btn-primary hidden !px-4 !py-2 sm:inline-flex">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+          <span data-i18n="nav.github">GitHub</span>
+        </a>
+        <button id="menu-btn" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white lg:hidden" aria-label="Menu" aria-expanded="false">
+          <svg id="menu-icon" class="h-5 w-5 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="mt-2 overflow-hidden rounded-2xl border border-white/10 bg-[#0d1220]/95 backdrop-blur-xl transition-all duration-300 lg:hidden" style="max-height:0; opacity:0;">
+      <nav class="flex flex-col p-2">
+        <a href="#features" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.features">Recursos</a>
+        <a href="#how" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.how">Como funciona</a>
+        <a href="#screens" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.screens">Telas</a>
+        <a href="#install" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.install">Instalar</a>
+        <a href="#cli" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.cli">CLI</a>
+        <a href="#faq" class="mobile-link rounded-xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white" data-i18n="nav.faq">Perguntas</a>
+        <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener"
+           class="mt-1 flex items-center justify-center gap-2 rounded-xl bg-gdrive-blue px-4 py-3 text-sm font-semibold text-white">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ===================== HERO ===================== -->
+<section id="hero" class="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
+  <div class="pointer-events-none absolute inset-0 grid-bg"></div>
+  <div class="pointer-events-none absolute -top-24 left-1/4 blob blob-a blob-blue"></div>
+  <div class="pointer-events-none absolute top-32 -right-20 blob blob-b blob-purple"></div>
+  <div class="pointer-events-none absolute bottom-0 left-0 blob blob-c blob-green"></div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+
+      <div>
+        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-300">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gdrive-green opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-gdrive-green"></span>
+          </span>
+          <span data-i18n="hero.badge">Versão 1.2.5 · Estável · GPL-3.0</span>
+        </div>
+
+        <h1 class="reveal mt-7 text-4xl font-bold leading-[1.08] sm:text-6xl lg:text-[4.1rem]" data-delay="1">
+          <span data-i18n="hero.title1">O Google Drive</span><br>
+          <span class="grad-text" data-i18n="hero.title2">nativo no Linux</span>
+        </h1>
+
+        <p class="reveal mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg" data-delay="2" data-i18n="hero.sub">
+          Um cliente de desktop não oficial, escrito em Rust, com o mesmo comportamento, aparência e recursos do Google Drive para computador no Windows.
+        </p>
+
+        <div class="reveal mt-9 flex flex-col gap-3 sm:flex-row" data-delay="3">
+          <a href="#install" class="btn btn-primary group">
+            <svg class="h-5 w-5 transition-transform group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+            </svg>
+            <span data-i18n="hero.cta">Baixar agora</span>
+          </a>
+          <a href="#screens" class="btn btn-ghost group">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>
+            </svg>
+            <span data-i18n="hero.cta2">Ver as telas</span>
+          </a>
+        </div>
+
+        <p class="reveal mt-5 flex items-center gap-2 text-xs text-slate-500" data-delay="4">
+          <svg class="h-4 w-4 text-gdrive-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>
+          </svg>
+          <span data-i18n="hero.note">Sem conta de servidor: você usa seu próprio Client ID do Google Cloud.</span>
+        </p>
+
+        <div class="reveal mt-12 grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-4" data-delay="5">
+          <div>
+            <div class="font-display text-3xl font-bold text-white">20+</div>
+            <div class="mt-1 text-xs text-slate-500" data-i18n="hero.stat1.l">telas no app</div>
+          </div>
+          <div>
+            <div class="font-display text-3xl font-bold text-white">6</div>
+            <div class="mt-1 text-xs text-slate-500" data-i18n="hero.stat2.l">gerenciadores de arquivos</div>
+          </div>
+          <div>
+            <div class="font-display text-3xl font-bold text-white">4</div>
+            <div class="mt-1 text-xs text-slate-500" data-i18n="hero.stat3.l">contas simultâneas</div>
+          </div>
+          <div>
+            <div class="font-display text-3xl font-bold text-white">0</div>
+            <div class="mt-1 text-xs text-slate-500" data-i18n="hero.stat4.l">bytes baixados sem abrir</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero visual -->
+      <div class="reveal relative" data-delay="2">
+        <div class="relative mx-auto max-w-lg lg:max-w-none">
+          <div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-gdrive-blue/25 via-gdrive-green/10 to-gdrive-purple/25 blur-2xl"></div>
+          <div class="grad-border relative overflow-hidden rounded-2xl bg-[#0f1421] p-2 shadow-2xl float-slow">
+            <div class="flex items-center gap-1.5 px-3 py-2">
+              <span class="terminal-dot bg-[#ff5f57]"></span>
+              <span class="terminal-dot bg-[#febc2e]"></span>
+              <span class="terminal-dot bg-[#28c840]"></span>
+              <span class="ml-3 font-mono text-[11px] text-slate-500" data-i18n="hero.path">~/Google Drive/Meu Drive</span>
+            </div>
+            <div class="relative">
+              <img src="assets/img/screenshots/janela-principal.png" alt="Janela principal do GDrive Desktop" class="w-full rounded-xl" loading="eager">
+              <div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 rounded-b-xl bg-gradient-to-t from-[#0f1421] to-transparent"></div>
+            </div>
+          </div>
+
+          <div class="glass float-slower absolute -bottom-8 -left-4 hidden items-center gap-3 rounded-2xl px-4 py-3 sm:flex lg:-left-10">
+            <span class="chip !h-9 !w-9 !border-gdrive-green/30 !bg-gdrive-green/10">
+              <svg class="h-4 w-4 text-gdrive-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>
+            </span>
+            <div>
+              <div class="text-xs font-semibold text-white" data-i18n="hero.card1.t">Sincronização concluída</div>
+              <div class="text-[11px] text-slate-500" data-i18n="hero.card1.d">há menos de um minuto</div>
+            </div>
+          </div>
+
+          <div class="glass float-slower absolute -right-4 -top-6 hidden items-center gap-3 rounded-2xl px-4 py-3 sm:flex lg:-right-8">
+            <span class="chip !h-9 !w-9 !border-gdrive-blue/30 !bg-gdrive-blue/10">
+              <svg class="h-4 w-4 text-gdrive-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 16V9m4 7V5m4 11v-4m4 4V8"/></svg>
+            </span>
+            <div>
+              <div class="text-xs font-semibold text-white" data-i18n="hero.card2.t">0 B baixados</div>
+              <div class="text-[11px] text-slate-500" data-i18n="hero.card2.d">sem abrir o arquivo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MARQUEE ===================== -->
+<section class="border-y border-white/5 bg-white/[.02] py-5">
+  <div class="marquee">
+    <div class="marquee__track">
+      <div class="marquee__group flex gap-3">
+        <span data-i18n="m1" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Sincronização</span>
+        <span data-i18n="m2" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Disponível off-line</span>
+        <span data-i18n="m3" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Menu do botão direito</span>
+        <span data-i18n="m4" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Miniaturas do Google</span>
+        <span data-i18n="m5" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Backup de pastas</span>
+        <span data-i18n="m6" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Modo Espelho</span>
+        <span data-i18n="m7" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Drives compartilhados</span>
+        <span data-i18n="m8" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Documentos do Google</span>
+        <span data-i18n="m9" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Detecção de ransomware</span>
+        <span data-i18n="m10" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Recuperação de conflitos</span>
+        <span data-i18n="m11" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Notificações</span>
+        <span data-i18n="m12" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Servidor MCP</span>
+        <span data-i18n="m13" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">Desinstalador</span>
+        <span data-i18n="m14" class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">CLI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section id="features" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-blue/25 bg-gdrive-blue/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-blue">
+        <span data-i18n="features.eyebrow">O que o app faz</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="features.title">Paridade com o app oficial, item a item</h2>
+      <p class="reveal mt-5 text-slate-400" data-delay="2" data-i18n="features.sub">
+        Cada área do Google Drive para computador foi reconstruída para Linux, do motor de sincronização ao menu do botão direito no seu gerenciador de arquivos.
+      </p>
+    </div>
+
+    <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="1">
+        <span class="chip text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b1.t">Pasta do Drive</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b1.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="2">
+        <span class="chip text-gdrive-green">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 21h14"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b2.t">Disponível off-line</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b2.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="3">
+        <span class="chip text-gdrive-purple">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-8.5-6"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 8.5 6"/><path d="M3 12h4m14 0h-4"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b3.t">Sincronização</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b3.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="1">
+        <span class="chip text-gdrive-yellow">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M19 8 12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b4.t">Documentos Google</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b4.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="2">
+        <span class="chip text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b5.t">Bandeja e janela</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b5.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="3">
+        <span class="chip text-gdrive-green">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7v6c0 4.5 3.4 7.7 8 9 4.6-1.3 8-4.5 8-9V7Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b6.t">Primeiro uso</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b6.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="4">
+        <span class="chip text-gdrive-purple">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b7.t">Miniaturas</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b7.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="5">
+        <span class="chip text-gdrive-yellow">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b8.t">Menu do botão direito</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b8.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="6">
+        <span class="chip text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b9.t">Compartilhar e versões</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b9.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="1">
+        <span class="chip text-gdrive-green">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b10.t">Instalação e remoção</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b10.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="2">
+        <span class="chip text-gdrive-purple">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 7.5 12 12l9-4.5Z"/><path d="M3 12.5 12 17l9-4.5M3 17.5 12 22l9-4.5"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b11.t">Ícones de status</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b11.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="3">
+        <span class="chip text-gdrive-yellow">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 11v5m0-5 2 2m-2-2-2 2"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b12.t">Backup e espelho</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b12.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="4">
+        <span class="chip text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b13.t">Contas</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b13.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="5">
+        <span class="chip text-gdrive-green">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="3"/><path d="M3 20a6 6 0 0 1 12 0M15 20a5 5 0 0 1 6-4"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b14.t">Drives compartilhados</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b14.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="6">
+        <span class="chip text-gdrive-red">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 7.7 8 9 4.6-1.3 8-4.5 8-9V6Z"/><path d="M12 8v5m0 3h.01"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b15.t">Proteção e recuperação</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b15.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="1">
+        <span class="chip text-gdrive-yellow">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b16.t">Avisos</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b16.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="2">
+        <span class="chip text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b17.t">Diagnóstico e feedback</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b17.d"></p>
+      </article>
+
+      <article class="fcard glass glass-hover reveal rounded-2xl p-6" data-delay="3">
+        <span class="chip text-gdrive-purple">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4m0 0 2.5 2.5M12 4 9.5 6.5"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><path d="M9.5 16.5a4 4 0 0 0 5 0"/></svg>
+        </span>
+        <h3 class="mt-5 text-lg font-semibold" data-i18n="features.b18.t">Assistentes de IA</h3>
+        <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="features.b18.d"></p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section id="how" class="relative overflow-hidden py-24 sm:py-32">
+  <div class="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-gdrive-blue/10 blur-[120px]"></div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-green/25 bg-gdrive-green/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-green">
+        <span data-i18n="how.eyebrow">Como funciona</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="how.title">Uma pasta na nuvem que se comporta como uma pasta de verdade</h2>
+      <p class="reveal mt-5 text-slate-400" data-delay="2" data-i18n="how.sub">
+        Uma pasta virtual via FUSE monta o Drive no sistema de arquivos. Você abre um arquivo e só o trecho lido é baixado — o resto continua na nuvem.
+      </p>
+    </div>
+
+    <!-- Diagram -->
+    <div class="reveal mt-16 grid gap-4 lg:grid-cols-4" data-delay="1">
+      <div class="glass glass-hover rounded-2xl p-6">
+        <div class="flex items-center gap-2 text-gdrive-blue">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span class="text-xs font-bold uppercase tracking-wider">UI</span>
+        </div>
+        <h3 class="mt-3 text-base font-semibold" data-i18n="how.l1.t">Interface (Tauri)</h3>
+        <p class="mt-1.5 text-sm text-slate-400" data-i18n="how.l1.d"></p>
+      </div>
+      <div class="glass glass-hover rounded-2xl p-6">
+        <div class="flex items-center gap-2 text-gdrive-yellow">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+          <span class="text-xs font-bold uppercase tracking-wider">FS</span>
+        </div>
+        <h3 class="mt-3 text-base font-semibold" data-i18n="how.l2.t">Gerenciadores de arquivos</h3>
+        <p class="mt-1.5 text-sm text-slate-400" data-i18n="how.l2.d"></p>
+      </div>
+      <div class="glass glass-hover rounded-2xl p-6">
+        <div class="flex items-center gap-2 text-gdrive-purple">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V7Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="text-xs font-bold uppercase tracking-wider">Core</span>
+        </div>
+        <h3 class="mt-3 text-base font-semibold" data-i18n="how.l3.t">Motor (serviço em Rust)</h3>
+        <p class="mt-1.5 text-sm text-slate-400" data-i18n="how.l3.d"></p>
+      </div>
+      <div class="glass glass-hover rounded-2xl p-6">
+        <div class="flex items-center gap-2 text-gdrive-green">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5"/><circle cx="12" cy="21" r="0"/></svg>
+          <span class="text-xs font-bold uppercase tracking-wider">API</span>
+        </div>
+        <h3 class="mt-3 text-base font-semibold" data-i18n="how.l4.t">Google Drive API</h3>
+        <p class="mt-1.5 text-sm text-slate-400" data-i18n="how.l4.d"></p>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-center gap-3 text-xs font-medium text-slate-500">
+      <span class="hidden h-px flex-1 bg-gradient-to-r from-transparent to-white/15 sm:block"></span>
+      <span class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5">
+        <svg class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 0-2 2v3m0 10v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+        D-Bus · HTTPS · OAuth 2.0
+      </span>
+      <span class="hidden h-px flex-1 bg-gradient-to-l from-transparent to-white/15 sm:block"></span>
+    </div>
+
+    <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="reveal glass rounded-2xl p-6" data-delay="1">
+        <svg class="h-6 w-6 text-gdrive-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 16V9m4 7V5m4 11v-4m4 4V8"/></svg>
+        <h4 class="mt-4 font-semibold" data-i18n="how.p1">Só os trechos lidos são baixados</h4>
+        <p class="mt-2 text-sm text-slate-400" data-i18n="how.p1d"></p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6" data-delay="2">
+        <svg class="h-6 w-6 text-gdrive-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        <h4 class="mt-4 font-semibold" data-i18n="how.p2">Fila que sobrevive a reinícios</h4>
+        <p class="mt-2 text-sm text-slate-400" data-i18n="how.p2d"></p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6" data-delay="3">
+        <svg class="h-6 w-6 text-gdrive-yellow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        <h4 class="mt-4 font-semibold" data-i18n="how.p3">Metadados em SQLite</h4>
+        <p class="mt-2 text-sm text-slate-400" data-i18n="how.p3d"></p>
+      </div>
+      <div class="reveal glass rounded-2xl p-6" data-delay="4">
+        <svg class="h-6 w-6 text-gdrive-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 21h16"/></svg>
+        <h4 class="mt-4 font-semibold" data-i18n="how.p4">Conflitos preservados</h4>
+        <p class="mt-2 text-sm text-slate-400" data-i18n="how.p4d"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SCREENS ===================== -->
+<section id="screens" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-purple/25 bg-gdrive-purple/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-purple">
+        <span data-i18n="screens.eyebrow">Telas</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="screens.title">Um app que parece o original</h2>
+      <p class="reveal mt-5 text-slate-400" data-delay="2" data-i18n="screens.sub">
+        Mesma linguagem visual, mesmos nomes, mesmas janelas. Clique em qualquer captura para ampliar.
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="reveal mt-10 flex flex-wrap items-center justify-center gap-2" data-delay="1">
+      <button class="tab-btn" data-filter="all" aria-selected="true" data-i18n="screens.all">Todas</button>
+      <button class="tab-btn" data-filter="main" aria-selected="false" data-i18n="screens.main">Principal</button>
+      <button class="tab-btn" data-filter="sync" aria-selected="false" data-i18n="screens.sync">Sincronização</button>
+      <button class="tab-btn" data-filter="share" aria-selected="false" data-i18n="screens.share">Compartilhamento</button>
+      <button class="tab-btn" data-filter="config" aria-selected="false" data-i18n="screens.config">Configuração</button>
+    </div>
+
+    <div id="gallery" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+      <button class="shot reveal" data-cat="main" data-delay="1" data-shot="assets/img/screenshots/janela-principal.png" data-title-key="shot.janela-principal">
+        <img src="assets/img/screenshots/janela-principal.png" alt="Janela principal" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.janela-principal">Janela principal</span>
+      </button>
+
+      <button class="shot reveal" data-cat="main" data-delay="2" data-shot="assets/img/screenshots/primeiro-uso.png" data-title-key="shot.primeiro-uso">
+        <img src="assets/img/screenshots/primeiro-uso.png" alt="Guia do primeiro uso" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.primeiro-uso">Guia do primeiro uso</span>
+      </button>
+
+      <button class="shot reveal" data-cat="sync" data-delay="3" data-shot="assets/img/screenshots/atividade.png" data-title-key="shot.atividade">
+        <img src="assets/img/screenshots/atividade.png" alt="Atividade de sincronização" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.atividade">Atividade de sincronização</span>
+      </button>
+
+      <button class="shot reveal" data-cat="main" data-delay="4" data-shot="assets/img/screenshots/menu-da-conta.png" data-title-key="shot.menu-da-conta">
+        <img src="assets/img/screenshots/menu-da-conta.png" alt="Menu da conta" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.menu-da-conta">Menu da conta</span>
+      </button>
+
+      <button class="shot reveal" data-cat="main" data-delay="5" data-shot="assets/img/screenshots/pesquisa.png" data-title-key="shot.pesquisa">
+        <img src="assets/img/screenshots/pesquisa.png" alt="Pesquisa rápida" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.pesquisa">Pesquisa rápida</span>
+      </button>
+
+      <button class="shot reveal" data-cat="sync" data-delay="6" data-shot="assets/img/screenshots/arquivos-off-line.png" data-title-key="shot.arquivos-off-line">
+        <img src="assets/img/screenshots/arquivos-off-line.png" alt="Arquivos off-line" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.arquivos-off-line">Arquivos off-line</span>
+      </button>
+
+      <button class="shot reveal" data-cat="config" data-delay="1" data-shot="assets/img/screenshots/preferencias.png" data-title-key="shot.preferencias">
+        <img src="assets/img/screenshots/preferencias.png" alt="Preferências" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.preferencias">Preferências</span>
+      </button>
+
+      <button class="shot reveal" data-cat="config" data-delay="2" data-shot="assets/img/screenshots/sobre.png" data-title-key="shot.sobre">
+        <img src="assets/img/screenshots/sobre.png" alt="Sobre" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.sobre">Sobre</span>
+      </button>
+
+      <button class="shot reveal" data-cat="config" data-delay="3" data-shot="assets/img/screenshots/desinstalar.png" data-title-key="shot.desinstalar">
+        <img src="assets/img/screenshots/desinstalar.png" alt="Desinstalar" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.desinstalar">Desinstalar</span>
+      </button>
+
+      <button class="shot reveal" data-cat="share" data-delay="4" data-shot="assets/img/screenshots/compartilhar.png" data-title-key="shot.compartilhar">
+        <img src="assets/img/screenshots/compartilhar.png" alt="Janela Compartilhar" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.compartilhar">Janela Compartilhar</span>
+      </button>
+
+      <button class="shot reveal" data-cat="share" data-delay="5" data-shot="assets/img/screenshots/versoes.png" data-title-key="shot.versoes">
+        <img src="assets/img/screenshots/versoes.png" alt="Gerenciar versões" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.versoes">Gerenciar versões</span>
+      </button>
+
+      <button class="shot reveal" data-cat="share" data-delay="6" data-shot="assets/img/screenshots/drives-compartilhados.png" data-title-key="shot.drives-compartilhados">
+        <img src="assets/img/screenshots/drives-compartilhados.png" alt="Drives compartilhados" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.drives-compartilhados">Drives compartilhados</span>
+      </button>
+
+      <button class="shot reveal" data-cat="share" data-delay="1" data-shot="assets/img/screenshots/adicionar-atalho.png" data-title-key="shot.adicionar-atalho">
+        <img src="assets/img/screenshots/adicionar-atalho.png" alt="Adicionar atalho ao Drive" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.adicionar-atalho">Adicionar atalho ao Drive</span>
+      </button>
+
+      <button class="shot reveal" data-cat="sync" data-delay="2" data-shot="assets/img/screenshots/meu-computador.png" data-title-key="shot.meu-computador">
+        <img src="assets/img/screenshots/meu-computador.png" alt="Meu computador" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.meu-computador">Meu computador</span>
+      </button>
+
+      <button class="shot reveal" data-cat="sync" data-delay="3" data-shot="assets/img/screenshots/espelhar.png" data-title-key="shot.espelhar">
+        <img src="assets/img/screenshots/espelhar.png" alt="Espelhar o Meu Drive" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.espelhar">Espelhar o Meu Drive</span>
+      </button>
+
+      <button class="shot reveal" data-cat="share" data-delay="4" data-shot="assets/img/screenshots/visao-drives.png" data-title-key="shot.visao-drives">
+        <img src="assets/img/screenshots/visao-drives.png" alt="Visão de drives compartilhados" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.visao-drives">Visão de drives compartilhados</span>
+      </button>
+
+      <button class="shot reveal" data-cat="config" data-delay="5" data-shot="assets/img/screenshots/configuracoes.png" data-title-key="shot.configuracoes">
+        <img src="assets/img/screenshots/configuracoes.png" alt="Configurações" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.configuracoes">Configurações</span>
+      </button>
+
+      <button class="shot reveal" data-cat="main" data-delay="6" data-shot="assets/img/screenshots/resumo.png" data-title-key="shot.resumo">
+        <img src="assets/img/screenshots/resumo.png" alt="Resumo do primeiro uso" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.resumo">Resumo do primeiro uso</span>
+      </button>
+
+      <button class="shot reveal" data-cat="main" data-delay="1" data-shot="assets/img/screenshots/tour.png" data-title-key="shot.tour">
+        <img src="assets/img/screenshots/tour.png" alt="Tour de boas-vindas" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.tour">Tour de boas-vindas</span>
+      </button>
+
+      <button class="shot reveal" data-cat="config" data-delay="2" data-shot="assets/img/screenshots/feedback.png" data-title-key="shot.feedback">
+        <img src="assets/img/screenshots/feedback.png" alt="Enviar feedback" loading="lazy" class="w-full">
+        <span class="block border-t border-white/10 bg-white/[.03] px-4 py-3 text-left text-sm font-medium text-slate-300" data-i18n="shot.feedback">Enviar feedback</span>
+      </button>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INSTALL ===================== -->
+<section id="install" class="relative py-24 sm:py-32">
+  <div class="pointer-events-none absolute right-0 top-1/4 -z-10 h-[420px] w-[420px] rounded-full bg-gdrive-green/10 blur-[110px]"></div>
+
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-blue/25 bg-gdrive-blue/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-blue">
+        <span data-i18n="install.eyebrow">Instalação</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="install.title">Baixe o pacote da sua distribuição</h2>
+      <p class="reveal mt-5 text-slate-400" data-delay="2" data-i18n="install.sub">
+        Escolha o seu sistema. Todos os pacotes são de 64 bits (x86_64) e verificados com o SHA256SUMS do release.
+      </p>
+    </div>
+
+    <div class="reveal mt-12 glass overflow-hidden rounded-2xl" data-delay="1">
+      <div class="flex flex-wrap gap-2 border-b border-white/10 p-3" id="install-tabs">
+        <button class="tab-btn" data-tab="deb" aria-selected="true">.deb</button>
+        <button class="tab-btn" data-tab="rpm" aria-selected="false">.rpm</button>
+        <button class="tab-btn" data-tab="arch" aria-selected="false">Arch</button>
+        <button class="tab-btn" data-tab="tar" aria-selected="false">.tar.gz</button>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div class="install-panel" data-panel="deb">
+          <p class="font-semibold text-white" data-i18n="install.deb.t">Ubuntu · Debian · Mint · Pop!_OS</p>
+          <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+            <code class="font-mono text-sm text-gdrive-green" data-i18n="install.deb.c">sudo apt install ./gdrive-desktop-linux_*.deb</code>
+            <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+          </div>
+        </div>
+
+        <div class="install-panel hidden" data-panel="rpm">
+          <p class="font-semibold text-white" data-i18n="install.rpm.t">Fedora · Nobara · openSUSE</p>
+          <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+            <code class="font-mono text-sm text-gdrive-green" data-i18n="install.rpm.c">sudo dnf install ./gdrive-desktop-linux-*.rpm</code>
+            <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+          </div>
+        </div>
+
+        <div class="install-panel hidden" data-panel="arch">
+          <p class="font-semibold text-white" data-i18n="install.arch.t">Arch · Manjaro · EndeavourOS · CachyOS</p>
+          <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+            <code class="font-mono text-sm text-gdrive-green" data-i18n="install.arch.c">sudo pacman -U ./gdrive-desktop-linux-*.pkg.tar.zst</code>
+            <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+          </div>
+        </div>
+
+        <div class="install-panel hidden" data-panel="tar">
+          <p class="font-semibold text-white" data-i18n="install.tar.t">Qualquer outra</p>
+          <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+            <code class="font-mono text-sm text-gdrive-green" data-i18n="install.tar.c">tar -xzf gdrive-desktop-linux-*.tar.gz &amp;&amp; ./gdrive-desktop-linux-*/install.sh</code>
+            <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+          </div>
+          <p class="mt-3 text-sm text-slate-500" data-i18n="install.tar.n"></p>
+        </div>
+
+        <div class="mt-8 grid gap-6 border-t border-white/10 pt-8 lg:grid-cols-2">
+          <div>
+            <h3 class="flex items-center gap-2 font-semibold text-white">
+              <svg class="h-5 w-5 text-gdrive-yellow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4v6c0 5-3.4 9.4-8 10-4.6-.6-8-5-8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span data-i18n="install.build">Ou compilar a partir do código</span>
+            </h3>
+            <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="install.build.d"></p>
+            <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+              <code class="font-mono text-sm text-slate-300">scripts/install-dev.sh</code>
+              <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+            </div>
+          </div>
+          <div>
+            <h3 class="flex items-center gap-2 font-semibold text-white">
+              <svg class="h-5 w-5 text-gdrive-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span data-i18n="install.check">Conferir a integridade dos arquivos</span>
+            </h3>
+            <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+              <code class="font-mono text-sm text-slate-300">sha256sum -c --ignore-missing SHA256SUMS</code>
+              <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+            </div>
+            <p class="mt-2.5 text-sm leading-relaxed text-slate-400" data-i18n="install.use"></p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <a href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener" class="btn btn-primary group">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+            <span data-i18n="install.cta">Ver todos os releases</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CLI ===================== -->
+<section id="cli" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-yellow/25 bg-gdrive-yellow/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-yellow">
+        <span data-i18n="cli.eyebrow">Linha de comando</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="cli.title">Uma CLI para o que você quiser automatizar</h2>
+      <p class="reveal mt-5 text-slate-400" data-delay="2" data-i18n="cli.sub">
+        O mesmo motor do app, direto no terminal — com um servidor MCP incluído para assistentes de IA.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
+      <!-- Terminal -->
+      <div class="reveal glass overflow-hidden rounded-2xl" data-delay="1">
+        <div class="flex items-center gap-1.5 border-b border-white/10 px-4 py-3">
+          <span class="terminal-dot bg-[#ff5f57]"></span>
+          <span class="terminal-dot bg-[#febc2e]"></span>
+          <span class="terminal-dot bg-[#28c840]"></span>
+          <span class="ml-3 font-mono text-[11px] text-slate-500" data-i18n="cli.term">gdrive-desktop-linux — terminal</span>
+        </div>
+        <div class="code-block overflow-x-auto p-5 font-mono text-[12.5px] leading-relaxed">
+          <p><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux login</span></p>
+          <p class="text-slate-500" data-i18n="cli.t1">→ abre o navegador para autorizar a conta</p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux status</span></p>
+          <p class="text-slate-500" data-i18n="cli.t2">→ conta, pasta e envios pendentes</p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux pin ~/Documentos</span></p>
+          <p class="text-slate-500" data-i18n="cli.t3">→ deixa disponível off-line</p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux pause</span> <span class="text-slate-500">/</span> <span class="text-white">resume</span></p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux lost-and-found</span></p>
+          <p class="text-slate-500" data-i18n="cli.t4">→ lista as edições guardadas por conflito</p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux uninstall --purge</span></p>
+          <p class="mt-3"><span class="text-gdrive-green">$</span> <span class="text-white">gdrive-desktop-linux open-pointer arquivo.gdoc</span></p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="reveal glass rounded-2xl p-6" data-delay="2">
+          <div class="flex items-center gap-2">
+            <span class="chip !h-10 !w-10">
+              <svg class="h-5 w-5 text-gdrive-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4m0 0 2.5 2.5M12 4 9.5 6.5"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
+            </span>
+            <h3 class="font-display text-lg font-semibold" data-i18n="cli.mcp">Servidor MCP</h3>
+          </div>
+          <p class="mt-3.5 text-sm leading-relaxed text-slate-400" data-i18n="cli.mcp.d"></p>
+          <div class="code-block mt-4 flex items-center justify-between gap-4 overflow-x-auto rounded-xl px-4 py-3">
+            <code class="font-mono text-xs text-gdrive-green" data-i18n="cli.mcp.c">claude mcp add google-drive -- gdrive-desktop-linux-mcp</code>
+            <button class="copy-btn shrink-0 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white">copy</button>
+          </div>
+        </div>
+
+        <div class="reveal glass rounded-2xl p-6" data-delay="3">
+          <div class="flex items-center gap-2">
+            <span class="chip !h-10 !w-10">
+              <svg class="h-5 w-5 text-gdrive-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            </span>
+            <h3 class="font-display text-lg font-semibold" data-i18n="cli.install">Instaladores</h3>
+          </div>
+          <p class="mt-3.5 text-sm leading-relaxed text-slate-400" data-i18n="cli.install.d"></p>
+        </div>
+
+        <div class="reveal glass rounded-2xl p-6" data-delay="4">
+          <div class="flex items-center gap-2">
+            <span class="chip !h-10 !w-10">
+              <svg class="h-5 w-5 text-gdrive-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>
+            </span>
+            <h3 class="font-display text-lg font-semibold" data-i18n="cli.uninstall">Desinstalar</h3>
+          </div>
+          <p class="mt-3.5 text-sm leading-relaxed text-slate-400" data-i18n="cli.uninstall.d"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- File managers -->
+    <div class="reveal mt-14" data-delay="1">
+      <h3 class="text-center font-display text-xl font-semibold">Dolphin · Nautilus · Nemo · Caja · Thunar · COSMIC Files</h3>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">Dolphin</p>
+          <p class="mt-1.5 text-sm text-slate-400">KDE Plasma 6 — plugin com menu, ícones de status e janelas de compartilhar e versões.</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">Nautilus</p>
+          <p class="mt-1.5 text-sm text-slate-400">GNOME, Ubuntu, Pop!_OS 22.04, Zorin — extensão que precisa do pacote <span class="font-mono text-xs">nautilus-python</span>.</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">Nemo</p>
+          <p class="mt-1.5 text-sm text-slate-400">Cinnamon, Mint — extensão com <span class="font-mono text-xs">python3-nemo</span>.</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">Caja</p>
+          <p class="mt-1.5 text-sm text-slate-400">MATE — extensão com <span class="font-mono text-xs">python3-caja</span>.</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">Thunar</p>
+          <p class="mt-1.5 text-sm text-slate-400">Xfce — extensão com <span class="font-mono text-xs">thunarx-python</span>.</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="font-semibold text-white">COSMIC Files</p>
+          <p class="mt-1.5 text-sm text-slate-400">Pop!_OS 24.04 — ações soltas no menu, com o prefixo "Google Drive:".</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section id="faq" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <span class="reveal inline-flex items-center gap-2 rounded-full border border-gdrive-red/25 bg-gdrive-red/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-gdrive-red">
+        <span data-i18n="faq.eyebrow">Perguntas frequentes</span>
+      </span>
+      <h2 class="reveal mt-5 text-3xl font-bold sm:text-5xl" data-delay="1" data-i18n="faq.title">Dúvidas comuns</h2>
+    </div>
+
+    <div class="mt-12 space-y-3" id="faq-list">
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="1">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q1">O app é do Google?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a1"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="2">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q2">Por que preciso criar um Client ID?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a2"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="3">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q3">Os arquivos ocupam espaço no meu disco?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a3"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="1">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q4">Posso usar sem internet?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a4"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="2">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q5">Apaguei um arquivo sem querer. E agora?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a5"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="3">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q6">Funciona em qual gerenciador de arquivos?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a6"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="1">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q7">Por que Rust?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a7"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="2">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q8">É seguro?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a8"></p></div></div>
+      </div>
+
+      <div class="acc-item glass reveal rounded-xl" data-delay="3">
+        <button class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+          <span class="font-semibold text-white" data-i18n="faq.q9">Onde ficam os registros para relatar um problema?</span>
+          <span class="acc-icon grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-slate-300">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </button>
+        <div class="acc-body"><div><p class="px-5 pb-5 text-sm leading-relaxed text-slate-400" data-i18n="faq.a9"></p></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <div class="reveal grad-border relative overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-16">
+      <div class="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-gdrive-blue/20 via-transparent to-gdrive-purple/20"></div>
+      <img src="assets/img/icon.png" alt="" class="mx-auto h-16 w-16 float-slow" aria-hidden="true">
+      <h2 class="mt-7 text-3xl font-bold sm:text-5xl" data-i18n="cta.title">Pronto para ter o Drive no seu Linux?</h2>
+      <p class="mx-auto mt-5 max-w-2xl text-slate-400" data-i18n="cta.sub">
+        Baixe o pacote, crie o seu Client ID e comece a sincronizar. Sem conta de servidor, sem dados seus em terceiros.
+      </p>
+      <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+        <a href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener" class="btn btn-primary group">
+          <svg class="h-5 w-5 transition-transform group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+          </svg>
+          <span data-i18n="cta.button">Baixar a versão 1.2.5</span>
+        </a>
+        <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener" class="btn btn-ghost">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+          <span data-i18n="cta.button2">Abrir no GitHub</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="border-t border-white/10 bg-black/20 py-14">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <img src="assets/img/icon-128.png" alt="" class="h-9 w-9" aria-hidden="true">
+          <span class="font-display text-base font-bold text-white">GDrive Desktop</span>
+        </div>
+        <p class="mt-4 max-w-sm text-sm leading-relaxed text-slate-500" data-i18n="footer.tag">
+          Cliente não oficial do Google Drive para Linux, escrito em Rust.
+        </p>
+        <p class="mt-4 max-w-md text-xs leading-relaxed text-slate-600" data-i18n="footer.disclaimer"></p>
+        <p class="mt-3 max-w-md text-xs leading-relaxed text-slate-600" data-i18n="footer.credits"></p>
+      </div>
+
+      <div>
+        <h3 class="font-display text-sm font-semibold uppercase tracking-wider text-slate-300">Links</h3>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-400">
+          <li><a class="transition hover:text-white" href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener" data-i18n="footer.source">Código-fonte</a></li>
+          <li><a class="transition hover:text-white" href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener" data-i18n="nav.install">Instalar</a></li>
+          <li><a class="transition hover:text-white" href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener" data-i18n="footer.issues">Relatar um problema</a></li>
+          <li><a class="transition hover:text-white" href="https://github.com/tzanella/gdrive-desktop-linux/blob/main/LICENSE" target="_blank" rel="noopener" data-i18n="footer.license">Licença</a></li>
+          <li><a class="transition hover:text-white" href="https://github.com/tzanella/gdrive-desktop-linux/blob/main/docs/termos-de-uso.md" target="_blank" rel="noopener" data-i18n="footer.legal">Direitos</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-display text-sm font-semibold uppercase tracking-wider text-slate-300">Recursos</h3>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-400">
+          <li><a class="transition hover:text-white" href="#features" data-i18n="nav.features">Recursos</a></li>
+          <li><a class="transition hover:text-white" href="#how" data-i18n="nav.how">Como funciona</a></li>
+          <li><a class="transition hover:text-white" href="#screens" data-i18n="nav.screens">Telas</a></li>
+          <li><a class="transition hover:text-white" href="#cli" data-i18n="nav.cli">CLI</a></li>
+          <li><a class="transition hover:text-white" href="#faq" data-i18n="nav.faq">Perguntas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
+      <p class="text-xs text-slate-600" data-i18n="footer.rights">Feito com ♥ para a comunidade Linux.</p>
+      <a href="#hero" class="flex items-center gap-2 text-xs text-slate-500 transition hover:text-white">
+        <span data-i18n="footer.top">Voltar ao topo</span>
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 15 7-7 7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot" data-i18n-attr="aria-label:screens.close">
+  <button id="lightbox-close" data-i18n-attr="aria-label:screens.close" class="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-xl border border-white/15 bg-white/10 text-white transition hover:bg-white/20" aria-label="Fechar">
+    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <figure class="p-4 text-center">
+    <img id="lightbox-img" src="" alt="">
+    <figcaption id="lightbox-cap" class="mt-4 text-sm font-medium text-slate-300"></figcaption>
+  </figure>
+</div>
+
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
