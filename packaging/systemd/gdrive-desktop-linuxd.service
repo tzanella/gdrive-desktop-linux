@@ -5,7 +5,7 @@ After=graphical-session.target
 
 [Service]
 Type=dbus
-BusName=io.github.junior9283.GDriveDesktopLinux1
+BusName=io.github.tzanella.GDriveDesktopLinux1
 ExecStart=/usr/bin/gdrive-desktop-linuxd
 # O SIGTERM desmonta; se o serviço cair, a montagem órfã é limpa na próxima partida.
 Restart=on-failure

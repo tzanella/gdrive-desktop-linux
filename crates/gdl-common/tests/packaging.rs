@@ -15,14 +15,14 @@ const PROGRAMS: [&str; 5] = [
 /// O que a instalação põe em `<prefixo>` (fora os programas).
 const FILES: &[&str] = &[
     "share/systemd/user/gdrive-desktop-linuxd.service",
-    "share/dbus-1/services/io.github.junior9283.GDriveDesktopLinux1.service",
-    "share/dbus-1/services/io.github.junior9283.GDriveDesktopLinux1.Ui.service",
-    "share/applications/io.github.junior9283.GDriveDesktopLinux.desktop",
-    "share/applications/io.github.junior9283.GDriveDesktopLinux.OpenPointer.desktop",
-    "share/applications/io.github.junior9283.GDriveDesktopLinux.Uninstall.desktop",
+    "share/dbus-1/services/io.github.tzanella.GDriveDesktopLinux1.service",
+    "share/dbus-1/services/io.github.tzanella.GDriveDesktopLinux1.Ui.service",
+    "share/applications/io.github.tzanella.GDriveDesktopLinux.desktop",
+    "share/applications/io.github.tzanella.GDriveDesktopLinux.OpenPointer.desktop",
+    "share/applications/io.github.tzanella.GDriveDesktopLinux.Uninstall.desktop",
     "share/mime/packages/gdrive-desktop-linux.xml",
-    "share/icons/hicolor/48x48/apps/io.github.junior9283.GDriveDesktopLinux.png",
-    "share/icons/hicolor/256x256/apps/io.github.junior9283.GDriveDesktopLinux.png",
+    "share/icons/hicolor/48x48/apps/io.github.tzanella.GDriveDesktopLinux.png",
+    "share/icons/hicolor/256x256/apps/io.github.tzanella.GDriveDesktopLinux.png",
     "share/gdrive-desktop-linux/icons/hicolor/scalable/status/gdl-synced.svg",
     "share/gdrive-desktop-linux/icons/hicolor/scalable/status/gdl-syncing-4.svg",
     "share/nautilus-python/extensions/gdrive_desktop_linux_menu.py",
@@ -215,8 +215,8 @@ fn destdir_stages_files_for_the_prefix() {
 fn removes_the_old_scalable_app_icon() {
     let dir = tempfile::tempdir().unwrap();
     let (bins, prefix) = (fake_bins(dir.path()), dir.path().join("pfx"));
-    let old = prefix
-        .join("share/icons/hicolor/scalable/apps/io.github.junior9283.GDriveDesktopLinux.svg");
+    let old =
+        prefix.join("share/icons/hicolor/scalable/apps/io.github.tzanella.GDriveDesktopLinux.svg");
     std::fs::create_dir_all(old.parent().unwrap()).unwrap();
     std::fs::write(&old, "<svg/>").unwrap();
 

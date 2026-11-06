@@ -23,7 +23,7 @@ using namespace gdrive;
 
 namespace
 {
-const QString APP_ICON = QStringLiteral("io.github.junior9283.GDriveDesktopLinux");
+const QString APP_ICON = QStringLiteral("io.github.tzanella.GDriveDesktopLinux");
 // O menu abre na hora: o serviço responde do banco local, e passando disso ele fica de fora.
 constexpr int MENU_TIMEOUT_MS = 500;
 

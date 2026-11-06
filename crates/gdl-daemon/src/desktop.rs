@@ -10,10 +10,10 @@ use gdl_common::fs::{remove_file_if_exists, write_atomic};
 use url::Url;
 
 /// Nome do arquivo em `~/.config/autostart`.
-pub const AUTOSTART_FILE: &str = "io.github.junior9283.GDriveDesktopLinux.desktop";
+pub const AUTOSTART_FILE: &str = "io.github.tzanella.GDriveDesktopLinux.desktop";
 
 const AUTOSTART: &str =
-    include_str!("../../../packaging/desktop/io.github.junior9283.GDriveDesktopLinux.desktop");
+    include_str!("../../../packaging/desktop/io.github.tzanella.GDriveDesktopLinux.desktop");
 
 const TRAY_EXEC: &str = "Exec=/usr/bin/gdrive-desktop-linux-tray";
 

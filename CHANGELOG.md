@@ -7,6 +7,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 
 ## [Não lançado]
 
+## [1.2.5-rev2] - 2026-11-06
+
+Segunda revisão da versão 1.2.5: anel de cores do Google One ao redor do avatar para assinantes (> 20 GB de cota), atualização global do identificador da aplicação para `io.github.tzanella.GDriveDesktopLinux` e ajustes gerais de estabilização.
+
+### Adicionado
+- Anel visual de 4 cores do Google One (vermelho, azul, verde e amarelo) ao redor do avatar do usuário e no menu de conta para contas com mais de 20 GB de espaço (assinantes de planos Google One / Workspace).
+
+### Modificado
+- Identificador do aplicativo (App ID e D-Bus) alterado em todo o código para `io.github.tzanella.GDriveDesktopLinux`.
+
 ## [1.2.5] - 2026-11-01
 
 Melhorias e correções: unificação da pasta Computadores no Google Drive, sincronização completa contínua, histórico persistente de atividade com origem e destino, persistência de notificações e botão para forçar sincronização sob demanda.
@@ -660,7 +670,8 @@ está feito, ou registrado em "Diferenças inevitáveis" no README.
 - `.gitignore` que impede a entrada de binários de terceiros e de material de engenharia reversa.
 - Este CHANGELOG e a política de versionamento.
 
-[Não lançado]: https://github.com/tzanella/gdrive-desktop-linux/compare/v1.2.5...HEAD
+[Não lançado]: https://github.com/tzanella/gdrive-desktop-linux/compare/v1.2.5-rev2...HEAD
+[1.2.5-rev2]: https://github.com/tzanella/gdrive-desktop-linux/compare/v1.2.5...v1.2.5-rev2
 [1.2.5]: https://github.com/tzanella/gdrive-desktop-linux/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/tzanella/gdrive-desktop-linux/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/junior9283/gdrive-desktop-linux/compare/v1.2.2...v1.2.3

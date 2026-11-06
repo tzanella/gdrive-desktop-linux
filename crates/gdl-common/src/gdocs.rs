@@ -57,7 +57,7 @@ mod tests {
     fn packaged_mime_types_match_pointer_extensions() {
         let xml = include_str!("../../../packaging/mime/gdrive-desktop-linux.xml");
         let desktop = include_str!(
-            "../../../packaging/desktop/io.github.junior9283.GDriveDesktopLinux.OpenPointer.desktop"
+            "../../../packaging/desktop/io.github.tzanella.GDriveDesktopLinux.OpenPointer.desktop"
         );
         let globs: Vec<&str> = attr_values(xml, "glob pattern")
             .into_iter()

@@ -33,18 +33,36 @@ function accountInfo(api, account) {
   return promise;
 }
 
-const avatar = (photo) => el('img', { class: 'avatar', src: photo, alt: '' });
+const TWENTY_GB = 20 * 1024 * 1024 * 1024;
+export const isSubscriber = (info) => Boolean(info && (info.quota_total < 0 || info.quota_total > TWENTY_GB));
+
+const avatar = (photo, subscriber = false) => {
+  const img = el('img', { class: 'avatar', src: photo, alt: '' });
+  if (!subscriber) return img;
+  return el('span', { class: 'avatar-wrapper google-one' }, img);
+};
 
 // O botão da conta: a inicial na hora e a foto quando chegar (só uma busca por conta).
 export function accountButton(button, api, account = '') {
   if (button.dataset.account === account) return;
   button.dataset.account = account;
   button.textContent = (account || '?').slice(0, 1).toUpperCase();
+  button.style.background = '';
   if (!account) return;
   accountInfo(api, account)
-    .then(({ photo }) => {
+    .then(({ info, photo }) => {
       // A conta pode ter mudado enquanto a foto vinha.
-      if (photo && button.dataset.account === account) button.replaceChildren(avatar(photo));
+      if (button.dataset.account === account) {
+        const sub = isSubscriber(info);
+        if (photo) {
+          button.style.background = 'transparent';
+          button.replaceChildren(avatar(photo, sub));
+        } else if (sub) {
+          button.style.background = 'transparent';
+          const initial = el('span', { class: 'avatar initial' }, (account || '?').slice(0, 1).toUpperCase());
+          button.replaceChildren(el('span', { class: 'avatar-wrapper google-one' }, initial));
+        }
+      }
     })
     // Sem a foto, fica a inicial.
     .catch(() => {});
@@ -55,7 +73,15 @@ export function accountButton(button, api, account = '') {
 function accountRow(api, t, { email, needsSignIn }) {
   const picture = el('span', { class: 'avatar initial' }, email.slice(0, 1).toUpperCase());
   accountInfo(api, email)
-    .then(({ photo }) => photo && picture.replaceWith(avatar(photo)))
+    .then(({ info, photo }) => {
+      const sub = isSubscriber(info);
+      if (photo) {
+        picture.replaceWith(avatar(photo, sub));
+      } else if (sub) {
+        const wrapper = el('span', { class: 'avatar-wrapper google-one' }, picture);
+        picture.replaceWith(wrapper);
+      }
+    })
     // Sem a foto, fica a inicial.
     .catch(() => {});
   return el('span', { class: 'account-row' }, picture,
@@ -90,12 +116,13 @@ export function accountMenu(anchor, ctx) {
   ]);
   accountInfo(api, account)
     .then(({ info, photo }) => {
+      const sub = isSubscriber(info);
       const used = formatSize(info.quota_used, locale);
       const usage = info.quota_total < 0
         ? t('account-usage-unlimited', { used })
         : t('account-usage', { used, total: formatSize(info.quota_total, locale) });
       card.replaceChildren(
-        ...(photo ? [avatar(photo)] : []),
+        ...(photo ? [avatar(photo, sub)] : []),
         el('span', {}, el('strong', {}, info.name || info.email), el('br'), info.email, el('br'), usage),
       );
     })

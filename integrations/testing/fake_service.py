@@ -10,8 +10,8 @@ import sys
 
 from gi.repository import Gio, GLib
 
-NAME = "io.github.junior9283.GDriveDesktopLinux1"
-PATH = "/io/github/junior9283/GDriveDesktopLinux1"
+NAME = "io.github.tzanella.GDriveDesktopLinux1"
+PATH = "/io/github/tzanella/GDriveDesktopLinux1"
 XML = f"""
 <node><interface name="{NAME}.Service">
   <method name="Menu"><arg type="as" direction="in"/><arg type="a(sss)" direction="out"/></method>

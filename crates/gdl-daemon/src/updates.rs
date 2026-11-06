@@ -36,7 +36,9 @@ pub fn version(tag: &str) -> Option<Version> {
 
 /// A versão deste programa.
 pub fn installed() -> Version {
-    version(env!("CARGO_PKG_VERSION")).expect("versão do pacote")
+    let pkg_ver = env!("CARGO_PKG_VERSION");
+    let base = pkg_ver.split(['-', '+']).next().unwrap_or(pkg_ver);
+    version(base).expect("versão do pacote")
 }
 
 /// `X.Y.Z`.

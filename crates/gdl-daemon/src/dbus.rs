@@ -27,7 +27,7 @@ impl Service {
 /// Os mesmos métodos e sinais do proxy em `gdl_ipc::Service`: mudou aqui, mude lá (os testes do
 /// serviço chamam tudo pelo proxy, e uma divergência falha neles). `account` é o e-mail da
 /// conta; vazio, a primeira.
-#[zbus::interface(name = "io.github.junior9283.GDriveDesktopLinux1.Service")]
+#[zbus::interface(name = "io.github.tzanella.GDriveDesktopLinux1.Service")]
 impl Service {
     /// Abre o login no navegador e devolve o endereço; o resultado vem em `LoginFinished`.
     /// `expected`: o e-mail da conta que precisa entrar de novo; vazio, uma conta nova.

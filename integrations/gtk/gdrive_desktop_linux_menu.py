@@ -10,10 +10,10 @@ import os
 
 from gi.repository import Gio, GLib, GObject
 
-SERVICE = "io.github.junior9283.GDriveDesktopLinux1"
-PATH = "/io/github/junior9283/GDriveDesktopLinux1"
+SERVICE = "io.github.tzanella.GDriveDesktopLinux1"
+PATH = "/io/github/tzanella/GDriveDesktopLinux1"
 INTERFACE = SERVICE + ".Service"
-APP_ICON = "io.github.junior9283.GDriveDesktopLinux"
+APP_ICON = "io.github.tzanella.GDriveDesktopLinux"
 TITLE = "Google Drive"
 # O menu abre na hora: o serviço responde do banco local, e passando disso ele fica de fora.
 MENU_TIMEOUT_MS = 500

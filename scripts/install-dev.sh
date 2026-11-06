@@ -85,7 +85,7 @@ install_as 644 "$repo/packaging/mime/gdrive-desktop-linux.xml" "$share/mime/pack
 for file in "$repo"/assets/icons/hicolor/*/apps/*.png; do
   install_as 644 "$file" "$share/icons/hicolor/${file#"$repo/assets/icons/hicolor/"}"
 done
-remove "$share/icons/hicolor/scalable/apps/io.github.junior9283.GDriveDesktopLinux.svg"
+remove "$share/icons/hicolor/scalable/apps/io.github.tzanella.GDriveDesktopLinux.svg"
 # Os emblemas de estado do Dolphin, no tema do sistema (é nele que o Dolphin procura).
 for file in "$repo"/assets/icons/hicolor/scalable/emblems/*.svg; do
   install_as 644 "$file" "$share/icons/hicolor/scalable/emblems/$(basename "$file")"

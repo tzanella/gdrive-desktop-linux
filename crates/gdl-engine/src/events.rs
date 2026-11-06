@@ -84,8 +84,6 @@ impl SyncSummary {
             SyncState::QuotaFull
         } else if self.syncing > 0 {
             SyncState::Syncing
-        } else if self.is_checking {
-            SyncState::Checking
         } else if self.errors > 0 {
             SyncState::Error
         } else {
@@ -246,7 +244,6 @@ mod tests {
             SyncState::QuotaFull
         );
         assert_eq!(with(|s| s.syncing = 3), SyncState::Syncing);
-        assert_eq!(with(|s| s.is_checking = true), SyncState::Checking);
         assert_eq!(with(|s| s.errors = 1), SyncState::Error);
         assert_eq!(base.state(), SyncState::Synced);
         assert_eq!(SyncState::QuotaFull.as_str(), "quota-full");

@@ -81,8 +81,8 @@ state "$d/a.txt" syncing
 python3 -I -W ignore::DeprecationWarning -c '
 import sys
 from gi.repository import Gio, GLib
-name = "io.github.junior9283.GDriveDesktopLinux1"
-Gio.bus_get_sync(Gio.BusType.SESSION).call_sync(name, "/io/github/junior9283/GDriveDesktopLinux1",
+name = "io.github.tzanella.GDriveDesktopLinux1"
+Gio.bus_get_sync(Gio.BusType.SESSION).call_sync(name, "/io/github/tzanella/GDriveDesktopLinux1",
     name + ".Service", "EmitStates", GLib.Variant("(as)", (sys.argv[1:],)), None, 0, -1)' "$d/a.txt"
 wait "$waiting" || true
 expect "StatesChanged redesenha o emblema" "mudou a.txt: gdl-emblem-syncing" "$(tail -1 "$work/overlay")"

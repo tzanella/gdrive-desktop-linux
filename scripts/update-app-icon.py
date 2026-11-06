@@ -26,7 +26,7 @@ from PIL import Image
 REPO = Path(__file__).resolve().parent.parent
 SOURCE = REPO / "assets/icons/app-icon-source.png"
 SIMBOLIC_SOURCE = REPO / "assets/icons/app-icon-simbolic.png"
-APP_ID = "io.github.junior9283.GDriveDesktopLinux"
+APP_ID = "io.github.tzanella.GDriveDesktopLinux"
 SIZES = [16, 22, 24, 32, 48, 64, 128, 256, 512]
 # Margem em volta do desenho, em fração do lado (como os ícones do Breeze).
 MARGIN = 0.06

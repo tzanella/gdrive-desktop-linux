@@ -3,7 +3,7 @@ title: gdrive-desktop-linux
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/junior9283/gdrive-desktop-linux/main/assets/icons/hicolor/128x128/apps/io.github.junior9283.GDriveDesktopLinux.png" alt="Ícone do gdrive-desktop-linux" width="128">
+  <img src="https://raw.githubusercontent.com/tzanella/gdrive-desktop-linux/main/assets/icons/hicolor/128x128/apps/io.github.tzanella.GDriveDesktopLinux.png" alt="Ícone do gdrive-desktop-linux" width="128">
 </p>
 
 # gdrive-desktop-linux

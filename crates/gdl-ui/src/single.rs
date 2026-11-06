@@ -19,7 +19,7 @@ struct UiObject {
     screens: mpsc::UnboundedSender<String>,
 }
 
-#[zbus::interface(name = "io.github.junior9283.GDriveDesktopLinux1.Ui")]
+#[zbus::interface(name = "io.github.tzanella.GDriveDesktopLinux1.Ui")]
 impl UiObject {
     fn open(&self, screen: String) {
         let _ = self.screens.send(screen);
