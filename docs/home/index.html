@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visão geral · Documentação</title>
+<meta name="description" content="Documentação do GDrive Desktop, cliente não oficial do Google Drive para Linux.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="home">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Documentação</p>
+
+<h1>GDrive Desktop</h1>
+
+<strong>GDrive Desktop</strong> é um cliente <strong>não oficial</strong> do Google Drive para Linux, escrito em <strong>Rust</strong>, com o mesmo
+comportamento, aparência e funcionalidades do Google Drive para computador (versão Windows).
+
+O app não tem servidores próprios: ele roda inteiro na sua máquina e conversa com a API pública do Google
+usando um <strong>Client ID que você mesmo cria</strong> no seu projeto do Google Cloud. Os seus arquivos nunca passam
+por um servidor do projeto.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Atalho</span>
+    <p>Quer instalar e usar em cinco minutos? Siga <a href="install-guide/">o guia de instalação</a> e depois
+    <a href="client-id/">o guia do Client ID</a>, nessa ordem.</p>
+  </div>
+</div>
+
+<h2>Comece por aqui</h2>
+
+<div class="grid gap-4 sm:grid-cols-2">
+
+  <a class="doc-card" href="install-guide/">
+    <div class="text-gdrive-blue">⬇</div>
+    <h3>Guia de instalação</h3>
+    <p>Pacotes <code>.deb</code>, <code>.rpm</code>, Arch e <code>.tar.gz</code>, compilação do código-fonte e desinstalação.</p>
+  </a>
+
+  <a class="doc-card" href="client-id/">
+    <div class="text-gdrive-purple">🔑</div>
+    <h3>Client ID do Google Cloud</h3>
+    <p>Passo a passo das credenciais: projeto, API, tela de consentimento, escopos e o primeiro login.</p>
+  </a>
+
+  <a class="doc-card" href="features/">
+    <div class="text-gdrive-green">✨</div>
+    <h3>Recursos do app</h3>
+    <p>Pasta do Drive, off-line, sincronização, compartilhamento, contas, backup, proteção e diagnóstico.</p>
+  </a>
+
+  <a class="doc-card" href="file-managers/">
+    <div class="text-gdrive-yellow">🗂️</div>
+    <h3>Gerenciadores de arquivos</h3>
+    <p>Dolphin, Nautilus, Nemo, Caja, Thunar e COSMIC Files: menu do botão direito, emblemas e miniaturas.</p>
+  </a>
+
+  <a class="doc-card" href="cli/">
+    <div class="text-gdrive-blue">⌨️</div>
+    <h3>CLI e servidor MCP</h3>
+    <p>Todos os comandos do terminal e o servidor MCP para assistentes de IA.</p>
+  </a>
+
+  <a class="doc-card" href="troubleshooting/">
+    <div class="text-gdrive-red">🛠️</div>
+    <h3>Solução de problemas</h3>
+    <p>Registros, diagnóstico, Lost and Found, recuperação de dados e erros mais comuns.</p>
+  </a>
+
+</div>
+
+<h2>O que o app faz</h2>
+
+O Drive aparece como uma pasta comum no seu gerenciador de arquivos, mas os arquivos ficam na nuvem até
+você abrir: só os trechos lidos são baixados. Em cima disso, o app entrega:
+
+- <strong>Sincronização automática</strong> de envio e recebimento, com fila que sobrevive a reinícios e queda de rede.
+- <strong>“Disponível off-line”</strong> em arquivos e pastas, e “Somente on-line” para liberar o espaço na hora.
+- <strong>Menu do botão direito</strong> nos gerenciadores de arquivos, com compartilhar, versões, atalhos e lixeira.
+- <strong>Até 4 contas</strong> Google ao mesmo tempo, cada uma com a sua pasta.
+- <strong>Drives compartilhados</strong>, visíveis na pasta e numa visão própria da janela principal.
+- <strong>Modo Espelho</strong>: o Meu Drive inteiro numa pasta comum do computador, disponível sem internet.
+- <strong>Pastas do computador</strong> sincronizadas e backup de pendrives quando conectados.
+- <strong>Proteção</strong>: detecta arquivos que parecem cifrados por um vírus e pausa os envios antes de estragar tudo.
+- <strong>Recuperação</strong>: dados locais danificados são refeitos a partir do Drive, com as edições pendentes guardadas.
+- <strong>Diagnóstico e feedback</strong> sem tokens, senhas ou e-mails nos relatórios.
+
+A lista completa está em <a href="features/">Recursos do app</a>.
+
+<h2>Como funciona</h2>
+
+<table class="docs-table">
+<thead><tr><th>Camada</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td><strong>Interface (Tauri)</strong></td><td>Bandeja, login, preferências e a janela principal com a atividade de sincronização.</td></tr>
+<tr><td><strong>Gerenciadores de arquivos</strong></td><td>Plugin do Dolphin e extensão GTK com o menu do botão direito e os emblemas de estado.</td></tr>
+<tr><td><strong>Motor (serviço em Rust)</strong></td><td>Pasta virtual via FUSE, banco SQLite com os metadados de todo o Drive, cache em blocos, fila de envios e resolução de conflitos.</td></tr>
+<tr><td><strong>Google Drive API</strong></td><td>HTTPS + OAuth 2.0, usando apenas a API pública.</td></tr>
+</tbody>
+</table>
+
+A interface e os gerenciadores conversam com o motor por <strong>D-Bus</strong>; o motor fala com o Google por <strong>HTTPS</strong>.
+
+<h2>Conceitos principais</h2>
+
+<table class="docs-table">
+<thead><tr><th>Termo</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><strong>Stream</strong></td><td>Modo padrão. O Drive aparece como pasta virtual: os arquivos estão na nuvem e são baixados sob demanda.</td></tr>
+<tr><td><strong>Espelho</strong></td><td>O Meu Drive inteiro vira uma pasta comum no computador, com os arquivos todos disponíveis offline. O Exchange troca entre os dois.</td></tr>
+<tr><td><strong>Disponível off-line</strong></td><td>Marca um arquivo ou pasta para ficar no disco. “Somente on-line” desfaz e libera o espaço.</td></tr>
+<tr><td><strong>Drives compartilhados</strong></td><td>Áreas compartilhadas com a sua conta. Continuam em Stream mesmo no modo Espelho, como no app oficial.</td></tr>
+<tr><td><strong>Computadores</strong></td><td>A pasta do Drive onde ficam as cópias das pastas do computador sincronizadas e o backup de dispositivos.</td></tr>
+<tr><td><strong>Lost and Found</strong></td><td>Guarda as versões conflitantes e as edições que ainda não subiram. Nada é sobrescrito em silêncio.</td></tr>
+</tbody>
+</table>
+
+<h2>Onde o app guarda as coisas</h2>
+
+<table class="docs-table">
+<thead><tr><th>Caminho</th><th>Conteúdo</th></tr></thead>
+<tbody>
+<tr><td><code>~/Google Drive/Meu Drive</code></td><td>O Drive montado em modo Stream.</td></tr>
+<tr><td><code>~/Google Drive/Drives compartilhados</code></td><td>Os Drives compartilhados da conta.</td></tr>
+<tr><td><code>~/Google Drive (&lt;e-mail&gt;)</code></td><td>A pasta de cada conta adicional (a partir da segunda).</td></tr>
+<tr><td><code>~/.local/share/gdrive-desktop-linux</code></td><td>Banco SQLite, cache em blocos e dados das contas.</td></tr>
+<tr><td><code>~/.config/gdrive-desktop-linux</code></td><td>Preferências (<code>preferences.toml</code>) do seu usuário.</td></tr>
+<tr><td><code>~/.local/state/gdrive-desktop-linux</code></td><td>Estado e relatórios de falha.</td></tr>
+<tr><td><code>/etc/gdrive-desktop-linux</code></td><td>Políticas do sistema (<code>policies.toml</code>) e padrões (<code>defaults.toml</code>).</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-note">
+  <div>🔐</div>
+  <div>
+    <span class="callout-title">Credenciais</span>
+    <p>O Client ID, o segredo, o token de acesso e o refresh token ficam no <strong>chaveiro do sistema</strong>
+    (KWallet ou GNOME Keyring), junto com o login — nunca em arquivo em disco.</p>
+  </div>
+</div>
+
+<h2>Licença e créditos</h2>
+
+O app é distribuído sob a <strong>GNU GPL v3.0</strong>. O repositório é mantido por
+[Túlio Zanella (@tzanella)](https://github.com/tzanella); o repositório original do projeto é
+[junior9283/gdrive-desktop-linux](https://github.com/junior9283/gdrive-desktop-linux), de onde vêm os créditos
+pela concepção e pela implementação original.
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Documentation</p>
+
+<h1>GDrive Desktop</h1>
+
+<strong>GDrive Desktop</strong> is an <strong>unofficial</strong> Google Drive client for Linux, written in <strong>Rust</strong>, with the same
+behavior, look and features as Google Drive for desktop (the Windows version).
+
+The app has no servers of its own: it runs entirely on your machine and talks to the public Google API
+using a <strong>Client ID that you create yourself</strong> in your own Google Cloud project. Your files never pass
+through a project server.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Shortcut</span>
+    <p>Want to install and use it in five minutes? Follow <a href="install-guide/">the installation guide</a>
+    and then <a href="client-id/">the Client ID guide</a>, in that order.</p>
+  </div>
+</div>
+
+<h2>Start here</h2>
+
+<div class="grid gap-4 sm:grid-cols-2">
+
+  <a class="doc-card" href="install-guide/">
+    <div class="text-gdrive-blue">⬇</div>
+    <h3>Installation guide</h3>
+    <p><code>.deb</code>, <code>.rpm</code>, Arch and <code>.tar.gz</code> packages, building from source and uninstalling.</p>
+  </a>
+
+  <a class="doc-card" href="client-id/">
+    <div class="text-gdrive-purple">🔑</div>
+    <h3>Google Cloud Client ID</h3>
+    <p>Step-by-step credentials: project, API, consent screen, scopes and the first login.</p>
+  </a>
+
+  <a class="doc-card" href="features/">
+    <div class="text-gdrive-green">✨</div>
+    <h3>App features</h3>
+    <p>Drive folder, offline, sync, sharing, accounts, backup, protection and diagnostics.</p>
+  </a>
+
+  <a class="doc-card" href="file-managers/">
+    <div class="text-gdrive-yellow">🗂️</div>
+    <h3>File managers</h3>
+    <p>Dolphin, Nautilus, Nemo, Caja, Thunar and COSMIC Files: right-click menu, badges and thumbnails.</p>
+  </a>
+
+  <a class="doc-card" href="cli/">
+    <div class="text-gdrive-blue">⌨️</div>
+    <h3>CLI and MCP server</h3>
+    <p>Every terminal command and the MCP server for AI assistants.</p>
+  </a>
+
+  <a class="doc-card" href="troubleshooting/">
+    <div class="text-gdrive-red">🛠️</div>
+    <h3>Troubleshooting</h3>
+    <p>Logs, diagnostics, Lost and Found, data recovery and the most common errors.</p>
+  </a>
+
+</div>
+
+<h2>What the app does</h2>
+
+The Drive shows up as a regular folder in your file manager, but the files stay in the cloud until you
+open them: only the chunks you read are downloaded. On top of that, the app delivers:
+
+- <strong>Automatic sync</strong> of uploads and downloads, with a queue that survives restarts and network drops.
+- <strong>“Available offline”</strong> for files and folders, and “Online only” to free the space right away.
+- <strong>Right-click menu</strong> in file managers, with sharing, versions, shortcuts and trash.
+- <strong>Up to 4 Google accounts</strong> at once, each with its own folder.
+- <strong>Shared drives</strong>, visible in the folder and in a dedicated view of the main window.
+- <strong>Mirror mode</strong>: your whole My Drive as a regular folder on the computer, available offline.
+- <strong>Computer folders</strong> synced and backup of USB drives when they are plugged in.
+- <strong>Protection</strong>: it spots files that look virus-encrypted and pauses uploads before things get bad.
+- <strong>Recovery</strong>: damaged local data is rebuilt from the Drive, with pending edits kept safe.
+- <strong>Diagnostics and feedback</strong> with no tokens, passwords or e-mails in the reports.
+
+The full list is in <a href="features/">App features</a>.
+
+<h2>How it works</h2>
+
+<table class="docs-table">
+<thead><tr><th>Layer</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><strong>Interface (Tauri)</strong></td><td>Tray, login, preferences and the main window with the sync activity.</td></tr>
+<tr><td><strong>File managers</strong></td><td>Dolphin plugin and GTK extension with the right-click menu and the status badges.</td></tr>
+<tr><td><strong>Engine (Rust service)</strong></td><td>Virtual folder via FUSE, SQLite database with the metadata of the whole Drive, block cache, upload queue and conflict resolution.</td></tr>
+<tr><td><strong>Google Drive API</strong></td><td>HTTPS + OAuth 2.0, using only the public API.</td></tr>
+</tbody>
+</table>
+
+The interface and the file managers talk to the engine over <strong>D-Bus</strong>; the engine talks to Google over <strong>HTTPS</strong>.
+
+<h2>Key concepts</h2>
+
+<table class="docs-table">
+<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><strong>Stream</strong></td><td>Default mode. The Drive shows up as a virtual folder: files live in the cloud and are downloaded on demand.</td></tr>
+<tr><td><strong>Mirror</strong></td><td>Your whole My Drive becomes a regular folder on the computer, with every file available offline. The Exchange switches between the two.</td></tr>
+<tr><td><strong>Available offline</strong></td><td>Marks a file or folder to stay on disk. “Online only” undoes it and frees the space.</td></tr>
+<tr><td><strong>Shared drives</strong></td><td>Areas shared with your account. They stay in Stream even in Mirror mode, just like the official app.</td></tr>
+<tr><td><strong>Computers</strong></td><td>The Drive folder that holds copies of synced computer folders and device backups.</td></tr>
+<tr><td><strong>Lost and Found</strong></td><td>Holds conflicting versions and edits that have not uploaded yet. Nothing is ever silently overwritten.</td></tr>
+</tbody>
+</table>
+
+<h2>Where the app keeps things</h2>
+
+<table class="docs-table">
+<thead><tr><th>Path</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td><code>~/Google Drive/My Drive</code></td><td>The Drive mounted in Stream mode.</td></tr>
+<tr><td><code>~/Google Drive/Shared drives</code></td><td>The shared drives of the account.</td></tr>
+<tr><td><code>~/Google Drive (&lt;e-mail&gt;)</code></td><td>The folder of each additional account (from the second one on).</td></tr>
+<tr><td><code>~/.local/share/gdrive-desktop-linux</code></td><td>SQLite database, block cache and account data.</td></tr>
+<tr><td><code>~/.config/gdrive-desktop-linux</code></td><td>Your user preferences (<code>preferences.toml</code>).</td></tr>
+<tr><td><code>~/.local/state/gdrive-desktop-linux</code></td><td>State and crash reports.</td></tr>
+<tr><td><code>/etc/gdrive-desktop-linux</code></td><td>System policies (<code>policies.toml</code>) and defaults (<code>defaults.toml</code>).</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-note">
+  <div>🔐</div>
+  <div>
+    <span class="callout-title">Credentials</span>
+    <p>The Client ID, the client secret, the access token and the refresh token live in the <strong>system keyring</strong>
+    (KWallet or GNOME Keyring), together with the login — never in a file on disk.</p>
+  </div>
+</div>
+
+<h2>License and credits</h2>
+
+The app is distributed under the <strong>GNU GPL v3.0</strong>. The repository is maintained by
+[Túlio Zanella (@tzanella)](https://github.com/tzanella); the original project repository is
+[junior9283/gdrive-desktop-linux](https://github.com/junior9283/gdrive-desktop-linux), which holds the credits
+for the original conception and implementation.
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

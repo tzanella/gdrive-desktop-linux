@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de instalação · Documentação</title>
+<meta name="description" content="Como instalar o GDrive Desktop no Linux: pacotes deb, rpm, Arch, tar.gz, compilação e desinstalação.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="install-guide">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Instalação</p>
+
+<h1>Guia de instalação</h1>
+
+O GDrive Desktop é distribuído como pacotes para as distribuições mais comuns e também como um
+`.tar.gz` que instala sem root. Esta página vai do download ao primeiro uso.
+
+<div class="callout callout-note">
+  <div>📋</div>
+  <div>
+    <span class="callout-title">Pré-requisitos</span>
+    <ul class="mt-2 space-y-1">
+      <li>Linux de 64 bits (x86_64).</li>
+      <li><strong>FUSE 3</strong> e <strong>WebKitGTK 4.1</strong> — já vêm no quase todas as distribuições gráficas.</li>
+      <li>Uma conta Google e um <strong>Client ID</strong> próprio: veja o <a href="client-id/">guia do Client ID</a>.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>1. Baixar o pacote</h2>
+
+Vá até a <a href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener">página de releases</a>
+e escolha o arquivo da sua distribuição:
+
+<table class="docs-table">
+<thead><tr><th>Distribuição</th><th>Arquivo</th><th>Como instalar</th></tr></thead>
+<tbody>
+<tr><td>Ubuntu 22.04+, Debian 12+, Mint, Pop!_OS</td><td><code>.deb</code></td><td><code>sudo apt install ./gdrive-desktop-linux_*.deb</code></td></tr>
+<tr><td>Fedora, Nobara, openSUSE</td><td><code>.rpm</code></td><td><code>sudo dnf install ./gdrive-desktop-linux-*.rpm</code><br><span class="text-xs">openSUSE: <code>sudo zypper install --allow-unsigned-rpm ./…rpm</code></span></td></tr>
+<tr><td>Arch, Manjaro, EndeavourOS, CachyOS</td><td><code>.pkg.tar.zst</code></td><td><code>sudo pacman -U ./gdrive-desktop-linux-*.pkg.tar.zst</code></td></tr>
+<tr><td>Qualquer outra</td><td><code>.tar.gz</code></td><td><code>tar -xzf …</code> e depois <code>./install.sh</code> (sem root, vai para <code>~/.local</code>)</td></tr>
+</tbody>
+</table>
+
+<h3>Conferir a integridade dos arquivos</h3>
+
+Todo release vem com um arquivo <code>SHA256SUMS</code>. Na mesma pasta do pacote, rode:
+
+<div class="code-block"><code>sha256sum -c --ignore-missing SHA256SUMS</code></div>
+
+O resultado esperado é <code>OK</code> para cada arquivo conferido. Se aparecer <code>FALHOU</code>, o download
+não foi concluído ou o arquivo foi alterado: baixe de novo.
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">Baixe sempre do repositório oficial</span>
+    <p>Este projeto não tem vínculo com o Google. Pacotes com o mesmo nome em outros sites não são
+    necessariamente este app.</p>
+  </div>
+</div>
+
+<h2>2. Instalar</h2>
+
+<h3>Ubuntu, Debian, Mint e Pop!_OS</h3>
+
+<div class="code-block"><code>sudo apt install ./gdrive-desktop-linux_*.deb</code></div>
+
+O `apt` resolve as dependências (FUSE 3 e WebKitGTK 4.1) automaticamente.
+
+<h3>Fedora, Nobara e openSUSE</h3>
+
+<div class="code-block"><code>sudo dnf install ./gdrive-desktop-linux-*.rpm</code></div>
+
+No openSUSE, o pacote não é assinado pelo repositório:
+
+<div class="code-block"><code>sudo zypper install --allow-unsigned-rpm ./gdrive-desktop-linux-*.rpm</code></div>
+
+<h3>Arch, Manjaro, EndeavourOS e CachyOS</h3>
+
+<div class="code-block"><code>sudo pacman -U ./gdrive-desktop-linux-*.pkg.tar.zst</code></div>
+
+<h3>Qualquer outra distribuição (ou sem root)</h3>
+
+O `.tar.gz` instala no seu usuário, em `~/.local`, sem pedir senha de administrador:
+
+<div class="code-block"><code>tar -xzf gdrive-desktop-linux-*.tar.gz
+cd gdrive-desktop-linux-*/
+./install.sh</code></div>
+
+Antes disso, instale o <strong>FUSE 3</strong> e o <strong>WebKitGTK 4.1</strong> da sua distribuição. O script `install.sh` também
+aceita `--prefix` para instalar em outro lugar.
+
+<h2>3. Dependências do gerenciador de arquivos</h2>
+
+Os pacotes `.deb`, `.rpm` e Arch já trazem o plugin do <strong>Dolphin</strong> e a extensão para os gerenciadores
+GTK. No `.tar.gz`, o plugin do Dolphin não vem (o Qt só procura plugins nas pastas do sistema) e as
+extensões GTK precisam do pacote de Python do gerenciador:
+
+<table class="docs-table">
+<thead><tr><th>Gerenciador</th><th>Pacote necessário</th></tr></thead>
+<tbody>
+<tr><td>Nautilus (GNOME, Ubuntu, Pop!_OS 22.04, Zorin)</td><td><code>nautilus-python</code> ou <code>python3-nautilus</code></td></tr>
+<tr><td>Nemo (Cinnamon, Mint)</td><td><code>python3-nemo</code></td></tr>
+<tr><td>Caja (MATE)</td><td><code>python3-caja</code> ou <code>python-caja</code></td></tr>
+<tr><td>Thunar (Xfce)</td><td><code>thunarx-python</code></td></tr>
+</tbody>
+</table>
+
+Exemplo no Debian/Ubuntu:
+
+<div class="code-block"><code>sudo apt install nautilus-python thunarx-python</code></div>
+
+Depois de instalar o pacote do gerenciador, <strong>reinicie o gerenciador</strong> para a extensão ser carregada.
+
+<h2>4. Compilar a partir do código</h2>
+
+Precisa de <strong>Rust 1.99 ou mais novo</strong>, FUSE 3 e as bibliotecas da janela.
+
+<table class="docs-table">
+<thead><tr><th>Distribuição</th><th>Dependências</th></tr></thead>
+<tbody>
+<tr><td>Fedora / Nobara</td><td><code>sudo dnf install fuse3 webkit2gtk4.1-devel libsoup3-devel librsvg2-devel dbus-devel</code></td></tr>
+<tr><td>Debian / Ubuntu</td><td><code>sudo apt install fuse3 libwebkit2gtk-4.1-dev librsvg2-dev libdbus-1-dev build-essential</code></td></tr>
+</tbody>
+</table>
+
+O script compila em modo release e instala para o seu usuário, sem root:
+
+<div class="code-block"><code>git clone https://github.com/tzanella/gdrive-desktop-linux.git
+cd gdrive-desktop-linux
+scripts/install-dev.sh</code></div>
+
+Opções úteis:
+
+<div class="code-block"><code>scripts/install-dev.sh --dry-run     # só mostra o que instalaria
+scripts/install-dev.sh --prefix /outro/lugar</code></div>
+
+O script instala os quatro programas (serviço, CLI, bandeja e janela), o serviço do usuário (systemd),
+a ativação do serviço e da janela pelo D-Bus, o atalho no menu de aplicativos, a abertura dos ponteiros
+`.gdoc`, os ícones e a extensão do menu do botão direito para Nautilus, Nemo, Caja e Thunar.
+
+Os plugins do <strong>Dolphin</strong> (menu e emblemas de estado) compilam à parte:
+
+<div class="code-block"><code>integrations/dolphin/build.sh</code></div>
+
+Eles precisam de <strong>CMake</strong> e <strong>KF6</strong> e vão para a pasta de plugins do Qt do sistema.
+
+<h2>5. Primeiro uso</h2>
+
+1. Procure <strong>Google Drive</strong> no menu de aplicativos (ou rode <code>gdrive-desktop-linux-tray</code>).
+2. A bandeja liga o serviço e, sem conta, abre o <strong>primeiro uso</strong>, que guia a criação do seu Client ID
+   parte por parte, com botões que abrem cada página do Google Cloud e copiam os valores.
+3. Cole o <strong>Client ID</strong> e o <strong>segredo</strong> e entre pelo navegador. Veja o
+   <a href="client-id/">guia do Client ID</a> para o passo a passo detalhado.
+4. A pasta aparece em <code>~/Google Drive/Meu Drive</code>.
+
+Outras contas entram pelo menu da conta (<strong>Adicionar outra conta</strong>) e ganham a própria pasta,
+<code>~/Google Drive (&lt;e-mail&gt;)</code>.
+
+<h2>6. Desinstalar</h2>
+
+Pelo item <strong>Desinstalar Google Drive</strong> do menu de aplicativos, ou pelo botão <strong>Desinstalar…</strong> em
+Mais opções › Sobre. A janela pergunta se apaga também os dados deste computador (conta conectada, cache,
+arquivos off-line, miniaturas e preferências). As cópias do <strong>Lost and Found</strong> ficam.
+
+Pelo terminal:
+
+<div class="code-block"><code>sudo apt remove gdrive-desktop-linux     # ou dnf remove / pacman -R</code></div>
+
+Só os programas saem e os dados ficam, como é o padrão no Linux. Para apagar tudo:
+
+<div class="code-block"><code>gdrive-desktop-linux uninstall --purge</code></div>
+
+> Desconecte a conta antes de usar `--purge`.
+
+Quem instalou pelo `.tar.gz` também pode rodar <code>./uninstall.sh</code> na pasta descompactada.
+
+<h2>Problemas na instalação</h2>
+
+<table class="docs-table">
+<thead><tr><th>Sintoma</th><th>O que fazer</th></tr></thead>
+<tbody>
+<tr><td><code>fusermount3: mount failed: Operation not permitted</code></td><td>O FUSE 3 não está instalado ou o usuário não está no grupo <code>fuse</code>. Recarregue a sessão (saia e entre de novo) depois de instalar o pacote.</td></tr>
+<tr><td>A janela não abre, mas a bandeja aparece</td><td>Falta o WebKitGTK 4.1. No Debian/Ubuntu: <code>sudo apt install libwebkit2gtk-4.1-dev</code> (no pacote final, a biblioteca em tempo de execução).</td></tr>
+<tr><td>O menu do botão direito não aparece no Nautilus/Nemo/Caja/Thunar</td><td>Falta o pacote de Python do gerenciador. Veja a <a href="file-managers/">página de gerenciadores</a>.</td></tr>
+<tr><td>O ícone não aparece no painel do Dolphin</td><td>O plugin do Dolphin não veio no <code>.tar.gz</code> ou o Qt não procura plugins nessa pasta. Compile com <code>integrations/dolphin/build.sh</code>.</td></tr>
+<tr><td><code>apt install ./arquivo.deb</code> falha com “Não foi possível obter o ficheiro”</td><td>O pacote não está no diretório atual. Use o caminho completo: <code>sudo apt install ./~/Downloads/gdrive-desktop-linux_1.2.5_amd64.deb</code>.</td></tr>
+<tr><td>O serviço não sobe</td><td>Veja <code>journalctl --user -u gdrive-desktop-linuxd</code> e a página de <a href="troubleshooting/">solução de problemas</a>.</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Installation</p>
+
+<h1>Installation guide</h1>
+
+GDrive Desktop ships as packages for the most common distributions and also as a `.tar.gz` that installs
+without root. This page goes from download to first use.
+
+<div class="callout callout-note">
+  <div>📋</div>
+  <div>
+    <span class="callout-title">Requirements</span>
+    <ul class="mt-2 space-y-1">
+      <li>64-bit Linux (x86_64).</li>
+      <li><strong>FUSE 3</strong> and <strong>WebKitGTK 4.1</strong> — already present in most graphical distributions.</li>
+      <li>A Google account and your own <strong>Client ID</strong>: see the <a href="client-id/">Client ID guide</a>.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>1. Download the package</h2>
+
+Go to the <a href="https://github.com/tzanella/gdrive-desktop-linux/releases/latest" target="_blank" rel="noopener">releases page</a>
+and pick the file for your distribution:
+
+<table class="docs-table">
+<thead><tr><th>Distribution</th><th>File</th><th>How to install</th></tr></thead>
+<tbody>
+<tr><td>Ubuntu 22.04+, Debian 12+, Mint, Pop!_OS</td><td><code>.deb</code></td><td><code>sudo apt install ./gdrive-desktop-linux_*.deb</code></td></tr>
+<tr><td>Fedora, Nobara, openSUSE</td><td><code>.rpm</code></td><td><code>sudo dnf install ./gdrive-desktop-linux-*.rpm</code><br><span class="text-xs">openSUSE: <code>sudo zypper install --allow-unsigned-rpm ./…rpm</code></span></td></tr>
+<tr><td>Arch, Manjaro, EndeavourOS, CachyOS</td><td><code>.pkg.tar.zst</code></td><td><code>sudo pacman -U ./gdrive-desktop-linux-*.pkg.tar.zst</code></td></tr>
+<tr><td>Anything else</td><td><code>.tar.gz</code></td><td><code>tar -xzf …</code> then <code>./install.sh</code> (no root, lands in <code>~/.local</code>)</td></tr>
+</tbody>
+</table>
+
+<h3>Verify the downloaded files</h3>
+
+Every release ships a <code>SHA256SUMS</code> file. In the same folder as the package, run:
+
+<div class="code-block"><code>sha256sum -c --ignore-missing SHA256SUMS</code></div>
+
+The expected output is <code>OK</code> for every checked file. If you see <code>FAILED</code>, the download
+did not finish or the file was tampered with: download it again.
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">Always download from the official repository</span>
+    <p>This project is not affiliated with Google. Packages with the same name on other sites are not
+    necessarily this app.</p>
+  </div>
+</div>
+
+<h2>2. Install</h2>
+
+<h3>Ubuntu, Debian, Mint and Pop!_OS</h3>
+
+<div class="code-block"><code>sudo apt install ./gdrive-desktop-linux_*.deb</code></div>
+
+`apt` resolves the dependencies (FUSE 3 and WebKitGTK 4.1) automatically.
+
+<h3>Fedora, Nobara and openSUSE</h3>
+
+<div class="code-block"><code>sudo dnf install ./gdrive-desktop-linux-*.rpm</code></div>
+
+On openSUSE the package is not signed by the repository:
+
+<div class="code-block"><code>sudo zypper install --allow-unsigned-rpm ./gdrive-desktop-linux-*.rpm</code></div>
+
+<h3>Arch, Manjaro, EndeavourOS and CachyOS</h3>
+
+<div class="code-block"><code>sudo pacman -U ./gdrive-desktop-linux-*.pkg.tar.zst</code></div>
+
+<h3>Any other distribution (or without root)</h3>
+
+The `.tar.gz` installs into your user directory, in `~/.local`, without asking for an admin password:
+
+<div class="code-block"><code>tar -xzf gdrive-desktop-linux-*.tar.gz
+cd gdrive-desktop-linux-*/
+./install.sh</code></div>
+
+Install <strong>FUSE 3</strong> and <strong>WebKitGTK 4.1</strong> from your distribution first. The `install.sh` script also
+accepts `--prefix` to install somewhere else.
+
+<h2>3. File manager dependencies</h2>
+
+The `.deb`, `.rpm` and Arch packages already include the <strong>Dolphin</strong> plugin and the extension for the GTK
+file managers. In the `.tar.gz`, the Dolphin plugin is not included (Qt only looks for plugins in system
+folders) and the GTK extensions need the file manager's Python package:
+
+<table class="docs-table">
+<thead><tr><th>File manager</th><th>Required package</th></tr></thead>
+<tbody>
+<tr><td>Nautilus (GNOME, Ubuntu, Pop!_OS 22.04, Zorin)</td><td><code>nautilus-python</code> or <code>python3-nautilus</code></td></tr>
+<tr><td>Nemo (Cinnamon, Mint)</td><td><code>python3-nemo</code></td></tr>
+<tr><td>Caja (MATE)</td><td><code>python3-caja</code> or <code>python-caja</code></td></tr>
+<tr><td>Thunar (Xfce)</td><td><code>thunarx-python</code></td></tr>
+</tbody>
+</table>
+
+Example on Debian/Ubuntu:
+
+<div class="code-block"><code>sudo apt install nautilus-python thunarx-python</code></div>
+
+After installing the file manager package, <strong>restart the file manager</strong> so the extension is loaded.
+
+<h2>4. Build it from source</h2>
+
+You need <strong>Rust 1.99 or newer</strong>, FUSE 3 and the window libraries.
+
+<table class="docs-table">
+<thead><tr><th>Distribution</th><th>Dependencies</th></tr></thead>
+<tbody>
+<tr><td>Fedora / Nobara</td><td><code>sudo dnf install fuse3 webkit2gtk4.1-devel libsoup3-devel librsvg2-devel dbus-devel</code></td></tr>
+<tr><td>Debian / Ubuntu</td><td><code>sudo apt install fuse3 libwebkit2gtk-4.1-dev librsvg2-dev libdbus-1-dev build-essential</code></td></tr>
+</tbody>
+</table>
+
+The script compiles in release mode and installs for your user, without root:
+
+<div class="code-block"><code>git clone https://github.com/tzanella/gdrive-desktop-linux.git
+cd gdrive-desktop-linux
+scripts/install-dev.sh</code></div>
+
+Useful options:
+
+<div class="code-block"><code>scripts/install-dev.sh --dry-run     # only shows what it would install
+scripts/install-dev.sh --prefix /some/other/place</code></div>
+
+The script installs the four programs (service, CLI, tray and window), the user service (systemd),
+the D-Bus activation of the service and the window, the applications menu shortcut, the opening of
+`.gdoc` pointers, the icons and the right-click menu extension for Nautilus, Nemo, Caja and Thunar.
+
+The <strong>Dolphin</strong> plugins (menu and status badges) are built separately:
+
+<div class="code-block"><code>integrations/dolphin/build.sh</code></div>
+
+They need <strong>CMake</strong> and <strong>KF6</strong> and go into the system Qt plugins folder.
+
+<h2>5. First run</h2>
+
+1. Look for <strong>Google Drive</strong> in your applications menu (or run <code>gdrive-desktop-linux-tray</code>).
+2. The tray starts the service and, with no account connected, opens the <strong>first run</strong>, which walks you
+   through creating your Client ID, with buttons that open each Google Cloud page and copy the values.
+3. Paste the <strong>Client ID</strong> and the <strong>client secret</strong> and sign in through the browser. See the
+   <a href="client-id/">Client ID guide</a> for the detailed walkthrough.
+4. The folder shows up at <code>~/Google Drive/My Drive</code>.
+
+Other accounts come in through the account menu (<strong>Add another account</strong>) and get their own folder,
+<code>~/Google Drive (&lt;e-mail&gt;)</code>.
+
+<h2>6. Uninstall</h2>
+
+From the <strong>Uninstall Google Drive</strong> item in your applications menu, or the <strong>Uninstall…</strong> button in
+More options › About. The window asks whether to also wipe the data on this computer (connected account,
+cache, offline files, thumbnails and preferences). <strong>Lost and Found</strong> copies are kept.
+
+From the terminal:
+
+<div class="code-block"><code>sudo apt remove gdrive-desktop-linux     # or dnf remove / pacman -R</code></div>
+
+Only the programs are removed and the data stays, which is the Linux default. To wipe everything:
+
+<div class="code-block"><code>gdrive-desktop-linux uninstall --purge</code></div>
+
+> Disconnect the account before using `--purge`.
+
+If you installed the `.tar.gz`, you can also run <code>./uninstall.sh</code> in the extracted folder.
+
+<h2>Installation problems</h2>
+
+<table class="docs-table">
+<thead><tr><th>Symptom</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td><code>fusermount3: mount failed: Operation not permitted</code></td><td>FUSE 3 is not installed or your user is not in the <code>fuse</code> group. Reload the session (log out and back in) after installing the package.</td></tr>
+<tr><td>The window never opens but the tray shows up</td><td>WebKitGTK 4.1 is missing. On Debian/Ubuntu: <code>sudo apt install libwebkit2gtk-4.1-dev</code> (the runtime library, for the packaged build).</td></tr>
+<tr><td>No right-click menu in Nautilus/Nemo/Caja/Thunar</td><td>The file manager's Python package is missing. See the <a href="file-managers/">file managers page</a>.</td></tr>
+<tr><td>The icon does not show in the Dolphin panel</td><td>The Dolphin plugin is not in the <code>.tar.gz</code>, or Qt does not look for plugins in that folder. Build it with <code>integrations/dolphin/build.sh</code>.</td></tr>
+<tr><td><code>apt install ./file.deb</code> fails with “Could not get file”</td><td>The package is not in the current directory. Use the full path: <code>sudo apt install ./~/Downloads/gdrive-desktop-linux_1.2.5_amd64.deb</code>.</td></tr>
+<tr><td>The service does not start</td><td>Check <code>journalctl --user -u gdrive-desktop-linuxd</code> and the <a href="troubleshooting/">troubleshooting page</a>.</td></tr>
+</tbody>
+</table>
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

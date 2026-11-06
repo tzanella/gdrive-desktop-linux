@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerenciadores de arquivos · Documentação</title>
+<meta name="description" content="Integração com Dolphin, Nautilus, Nemo, Caja, Thunar e COSMIC Files: menu do botão direito, emblemas e miniaturas.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="file-managers">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-yellow">Integração</p>
+
+<h1>Gerenciadores de arquivos</h1>
+
+O app conversa com o seu gerenciador de arquivos por <strong>D-Bus</strong>: o serviço do Drive publica ações que o
+Dolphin (plugin) e os gerenciadores GTK (extensão) mostram no menu do botão direito.
+
+<h2>Suporte por gerenciador</h2>
+
+<table class="docs-table">
+<thead><tr><th>Gerenciador</th><th>Ambiente</th><th>Como funciona</th><th>Precisa de</th></tr></thead>
+<tbody>
+<tr><td><strong>Dolphin</strong></td><td>KDE Plasma 6</td><td>Plugin: menu do botão direito completo, emblemas de estado e janelas de compartilhar e versões.</td><td>Nada (vem no pacote)</td></tr>
+<tr><td><strong>Nautilus</strong></td><td>GNOME, Ubuntu, Pop!_OS 22.04, Zorin</td><td>Extensão Python com o submenu Google Drive.</td><td><code>nautilus-python</code></td></tr>
+<tr><td><strong>Nemo</strong></td><td>Cinnamon, Mint</td><td>Extensão Python com o submenu Google Drive.</td><td><code>python3-nemo</code></td></tr>
+<tr><td><strong>Caja</strong></td><td>MATE</td><td>Extensão Python com o submenu Google Drive.</td><td><code>python3-caja</code></td></tr>
+<tr><td><strong>Thunar</strong></td><td>Xfce</td><td>Extensão Python com o submenu Google Drive.</td><td><code>thunarx-python</code></td></tr>
+<tr><td><strong>COSMIC Files</strong></td><td>Pop!_OS 24.04</td><td>Não aceita extensões nem submenus: o serviço põe as ações soltas, com “Google Drive:” no nome, e elas avisam quando o item não é do Meu Drive.</td><td>Nada</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-warn">
+  <div>📦</div>
+  <div>
+    <span class="callout-title">O plugin do Dolphin no <code>.tar.gz</code></span>
+    <p>Ele vem pronto nos pacotes <code>.deb</code>, <code>.rpm</code> e Arch. No <code>.tar.gz</code> não:
+    o Qt só procura plugins nas pastas do sistema. Compile com
+    <code>integrations/dolphin/build.sh</code> (precisa de CMake e KF6).</p>
+  </div>
+</div>
+
+<h2>O que aparece no menu</h2>
+
+Dentro da pasta do Drive (Meu Drive ou Drives compartilhados), o botão direito num arquivo ou pasta
+mostra o submenu <strong>Google Drive</strong>:
+
+<table class="docs-table">
+<thead><tr><th>Ação</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td>Abrir no navegador</td><td>Abre o item na web do Google Drive.</td></tr>
+<tr><td>Compartilhar</td><td>Abre a janela Compartilhar: pessoas, papéis, acesso geral e link.</td></tr>
+<tr><td>Copiar link</td><td>Copia o link e avisa <strong>quem pode abrir</strong> (só você, invited ou anyone).</td></tr>
+<tr><td>Gerenciar versões</td><td>Abre a janela de versões: baixar, restaurar ou manter para sempre.</td></tr>
+<tr><td>Adicionar atalho ao Drive</td><td>Escolhe a pasta onde o atalho será criado (Meu Drive ou um Drive compartilhado).</td></tr>
+<tr><td>Disponível off-line / Somente on-line</td><td>Marca conforme o estado atual do item.</td></tr>
+<tr><td>Novo Documento / Planilha / Apresentação</td><td>Cria o documento do Google na mesma pasta.</td></tr>
+<tr><td>Atualizar</td><td>Reindexa a pasta.</td></tr>
+<tr><td>Ver a lixeira</td><td>Abre a <code>.Lixeira do Drive</code>.</td></tr>
+</tbody>
+</table>
+
+Nos arquivos do Office, o menu também oferece abrir no <strong>Documentos</strong>, <strong>Planilhas</strong> ou <strong>Apresentações</strong>.
+
+Fora da pasta do Drive, o submenu <strong>não aparece</strong>. No Dolphin, porém, uma pasta fora do Drive ganha a
+opção <strong>Sincronizar esta pasta com o Google Drive</strong> (veja a seção de backup).
+
+<h2>Emblemas de estado (Dolphin)</h2>
+
+No Dolphin, cada arquivo do Drive mostra um emblema:
+
+<table class="docs-table">
+<thead><tr><th>Emblema</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><strong>Na nuvem</strong></td><td>O arquivo está na nuvem; abrir baixa só o que for lido.</td></tr>
+<tr><td><strong>Off-line</strong></td><td>Marcado como disponível off-line.</td></tr>
+<tr><td><strong>Sincronizando</strong></td><td>Envio ou download em andamento.</td></tr>
+<tr><td><strong>Em conflito</strong></td><td>Há uma versão divergente no Lost and Found.</td></tr>
+<tr><td><strong>Erro</strong></td><td>O envio ou o download falhou (o “!” some quando o envio dá certo).</td></tr>
+</tbody>
+</table>
+
+<h2>Miniaturas</h2>
+
+As imagens aparecem <strong>com miniatura</strong> no Dolphin e em outros gerenciadores, usando as miniaturas do
+próprio Google — o arquivo em si <strong>não é baixado</strong> só para mostrar a imagem. As miniaturas ficam no cache
+padrão do freedesktop (`~/.cache/thumbnails`).
+
+<h2>Exclusão do indexador do KDE</h2>
+
+No KDE, o app tira a pasta do Drive do indexador de arquivos (<strong>Baloo</strong>), que baixaria tudo para ler o
+conteúdo dos arquivos e deixaria o computador lento. As outras pastas excluídas continuam como estavam.
+Desinstalar o app desfaz a mudança.
+
+<h2>Reiniciar o gerenciador</h2>
+
+Depois de instalar o pacote do gerenciador (ou o plugin do Dolphin), reinicie o gerenciador para a
+extensão ser carregada:
+
+<div class="code-block"><code>nautilus -q          # Nautilus
+nemo -q              # Nemo
+thunar -q            # Thunar
+caja -q              # Caja
+killall dolphin      # Dolphin</code></div>
+
+<h2>Limitações conhecidas</h2>
+
+<table class="docs-table">
+<thead><tr><th>Limitação</th><th>Por quê</th></tr></thead>
+<tbody>
+<tr><td>“Adicionar ao espelho” não existe no menu do Dolphin</td><td>No Linux o Espelho é sempre do Meu Drive inteiro, não de pastas escolhidas.</td></tr>
+<tr><td>“Perguntar ao Gemini” não existe no menu do Dolphin</td><td>Não há endereço público para abrir um arquivo no Gemini; o cartão da janela principal leva à página do Gemini.</td></tr>
+<tr><td>Pastas de rede (NAS) não podem ser sincronizadas</td><td>O app recusa volumes de rede e FUSE.</td></tr>
+<tr><td>No COSMIC Files as ações vêm soltas</td><td>O COSMIC Files não aceita extensões nem submenus.</td></tr>
+<tr><td>Mover um item para um Drive compartilhado pergunta depois</td><td>Uma pasta montada não tem como perguntar no meio de um <code>mv</code>.</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-note">
+  <div>🐧</div>
+  <div>
+    <span class="callout-title">Dica de uso</span>
+    <p>No menu do botão direito do Dolphin, use o emblema de estado para saber se o arquivo está na
+    nuvem antes de abrir um vídeo grande: ele só baixa o trecho que você assiste.</p>
+  </div>
+</div>
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-yellow">Integration</p>
+
+<h1>File managers</h1>
+
+The app talks to your file manager over <strong>D-Bus</strong>: the Drive service publishes actions that Dolphin (a
+plugin) and the GTK file managers (an extension) show in the right-click menu.
+
+<h2>Support per file manager</h2>
+
+<table class="docs-table">
+<thead><tr><th>File manager</th><th>Environment</th><th>How it works</th><th>Needs</th></tr></thead>
+<tbody>
+<tr><td><strong>Dolphin</strong></td><td>KDE Plasma 6</td><td>Plugin: full right-click menu, status badges and the sharing and versions windows.</td><td>Nothing (ships in the package)</td></tr>
+<tr><td><strong>Nautilus</strong></td><td>GNOME, Ubuntu, Pop!_OS 22.04, Zorin</td><td>Python extension with the Google Drive submenu.</td><td><code>nautilus-python</code></td></tr>
+<tr><td><strong>Nemo</strong></td><td>Cinnamon, Mint</td><td>Python extension with the Google Drive submenu.</td><td><code>python3-nemo</code></td></tr>
+<tr><td><strong>Caja</strong></td><td>MATE</td><td>Python extension with the Google Drive submenu.</td><td><code>python3-caja</code></td></tr>
+<tr><td><strong>Thunar</strong></td><td>Xfce</td><td>Python extension with the Google Drive submenu.</td><td><code>thunarx-python</code></td></tr>
+<tr><td><strong>COSMIC Files</strong></td><td>Pop!_OS 24.04</td><td>It does not take extensions or submenus: the service puts the actions loose, with “Google Drive:” in the name, and they warn when the item is not from My Drive.</td><td>Nothing</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-warn">
+  <div>📦</div>
+  <div>
+    <span class="callout-title">The Dolphin plugin in the <code>.tar.gz</code></span>
+    <p>It comes ready-made in the <code>.deb</code>, <code>.rpm</code> and Arch packages. It does not in
+    the <code>.tar.gz</code>: Qt only looks for plugins in system folders. Build it with
+    <code>integrations/dolphin/build.sh</code> (needs CMake and KF6).</p>
+  </div>
+</div>
+
+<h2>What shows up in the menu</h2>
+
+Inside the Drive folder (My Drive or shared drives), right-clicking a file or folder shows the
+<strong>Google Drive</strong> submenu:
+
+<table class="docs-table">
+<thead><tr><th>Action</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Open in the browser</td><td>Opens the item on the Google Drive website.</td></tr>
+<tr><td>Share</td><td>Opens the Share window: people, roles, general access and link.</td></tr>
+<tr><td>Copy link</td><td>Copies the link and warns <strong>who can open it</strong> (only you, invited or anyone).</td></tr>
+<tr><td>Manage versions</td><td>Opens the versions window: download, restore or keep forever.</td></tr>
+<tr><td>Add shortcut to Drive</td><td>Picks the folder where the shortcut is created (My Drive or a shared drive).</td></tr>
+<tr><td>Available offline / Online only</td><td>Marks according to the current state of the item.</td></tr>
+<tr><td>New Document / Sheet / Slides</td><td>Creates the Google document in the same folder.</td></tr>
+<tr><td>Refresh</td><td>Re-indexes the folder.</td></tr>
+<tr><td>Show the trash</td><td>Opens <code>.Drive Trash</code>.</td></tr>
+</tbody>
+</table>
+
+On Office files, the menu also offers to open them in <strong>Docs</strong>, <strong>Sheets</strong> or <strong>Slides</strong>.
+
+Outside the Drive folder the submenu does <strong>not</strong> show up. In Dolphin, though, a folder outside the
+Drive gains the <strong>Sync this folder with Google Drive</strong> option (see the backup section).
+
+<h2>Status badges (Dolphin)</h2>
+
+In Dolphin, every Drive file shows a badge:
+
+<table class="docs-table">
+<thead><tr><th>Badge</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><strong>In the cloud</strong></td><td>The file is in the cloud; opening it downloads only what is read.</td></tr>
+<tr><td><strong>Offline</strong></td><td>Marked as available offline.</td></tr>
+<tr><td><strong>Syncing</strong></td><td>An upload or download is in progress.</td></tr>
+<tr><td><strong>In conflict</strong></td><td>There is a diverging version in Lost and Found.</td></tr>
+<tr><td><strong>Error</strong></td><td>The upload or download failed (the “!” disappears once the upload succeeds).</td></tr>
+</tbody>
+</table>
+
+<h2>Thumbnails</h2>
+
+Images show <strong>a thumbnail</strong> in Dolphin and other file managers, using Google's own thumbnails — the file
+itself is <strong>not downloaded</strong> just to show the picture. Thumbnails live in the standard freedesktop cache
+(`~/.cache/thumbnails`).
+
+<h2>Excluding the KDE indexer</h2>
+
+On KDE, the app takes the Drive folder out of the file indexer (<strong>Baloo</strong>), which would download
+everything just to read the file contents and slow your computer down. The other excluded folders stay
+as they were. Uninstalling the app undoes the change.
+
+<h2>Restarting the file manager</h2>
+
+After installing the file manager package (or the Dolphin plugin), restart the file manager so the
+extension gets loaded:
+
+<div class="code-block"><code>nautilus -q          # Nautilus
+nemo -q              # Nemo
+thunar -q            # Thunar
+caja -q              # Caja
+killall dolphin      # Dolphin</code></div>
+
+<h2>Known limitations</h2>
+
+<table class="docs-table">
+<thead><tr><th>Limitation</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>There is no “Add to mirror” in the Dolphin menu</td><td>On Linux the Mirror is always the whole My Drive, not chosen folders.</td></tr>
+<tr><td>There is no “Ask Gemini” in the Dolphin menu</td><td>There is no public address to open a file in Gemini; the card in the main window links to the Gemini page.</td></tr>
+<tr><td>Network folders (NAS) cannot be synced</td><td>The app refuses network and FUSE volumes.</td></tr>
+<tr><td>On COSMIC Files the actions come loose</td><td>COSMIC Files does not take extensions or submenus.</td></tr>
+<tr><td>Moving an item into a shared drive asks afterwards</td><td>A mounted folder cannot ask in the middle of a <code>mv</code>.</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-note">
+  <div>🐧</div>
+  <div>
+    <span class="callout-title">Tip</span>
+    <p>In the Dolphin right-click menu, use the status badge to know whether a file is in the cloud
+    before opening a big video: it only downloads the part you watch.</p>
+  </div>
+</div>
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

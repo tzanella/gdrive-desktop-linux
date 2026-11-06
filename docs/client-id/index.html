@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client ID do Google Cloud · Documentação</title>
+<meta name="description" content="Como criar o seu Client ID no Google Cloud passo a passo: projeto, API, consentimento, escopos, publicação e credencial.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="client-id">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-purple">Credenciais</p>
+
+<h1>Client ID do Google Cloud</h1>
+
+O GDrive Desktop <strong>não tem uma identidade própria no Google</strong>. Cada pessoa cria a sua, de graça, no
+Google Cloud. Leva uns 10 minutos, só precisa ser feito uma vez e ninguém além de você usa a credencial.
+
+O primeiro uso do app traz este mesmo guia, com um botão que abre cada página do Google Cloud e botões
+para copiar os escopos e os endereços da tela de consentimento.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Por que isso é assim?</span>
+    <p>O projeto não tem servidores e não recebe nenhum dado seu. Sem um Client ID próprio, qualquer
+    pessoa que usasse o app compartilharia a mesma credencial — e o Google revogaria o acesso de todo
+    mundo assim que uma conta fosse comprometida. Com o seu Client ID, só você usa, e você pode revogar
+    quando quiser.</p>
+  </div>
+</div>
+
+<h2>Resumo em 6 passos</h2>
+
+<table class="docs-table">
+<thead><tr><th>#</th><th>Onde no Google Cloud</th><th>O que fazer</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Seletor de projetos</td><td>Criar um projeto novo</td></tr>
+<tr><td>2</td><td>APIs e serviços → Biblioteca</td><td>Ativar a <strong>Google Drive API</strong></td></tr>
+<tr><td>3</td><td>Google Auth Platform → Branding</td><td>Preencher o app e o domínio</td></tr>
+<tr><td>4</td><td>Google Auth Platform → Acesso a dados</td><td>Adicionar os <strong>3 escopos</strong></td></tr>
+<tr><td>5</td><td>Google Auth Platform → Público-alvo</td><td><strong>Publicar o app</strong></td></tr>
+<tr><td>6</td><td>APIs e serviços → Credenciais</td><td>Criar o <strong>ID do cliente OAuth</strong> (App para computador)</td></tr>
+</tbody>
+</table>
+
+<h2>1. Criar um projeto</h2>
+
+1. Abra o [Google Cloud Console](https://console.cloud.google.com/) com a conta Google que você vai usar.
+2. No seletor de projetos, no alto da página, clique em <strong>Novo projeto</strong>.
+3. Dê um nome (por exemplo, `Drive no Linux`) e clique em <strong>Criar</strong>.
+4. Confira se o projeto novo está <strong>selecionado</strong> antes de seguir — o console lembra o último projeto
+   usado, e um projeto errado aqui é a causa nº 1 de erro depois.
+
+<div class="callout callout-note">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Dica</span>
+    <p>Um projeto por pessoa é o suficiente. Se você usa o app em vários computadores, use o mesmo
+    Client ID nos dois.</p>
+  </div>
+</div>
+
+<h2>2. Ativar a Google Drive API</h2>
+
+1. No menu lateral, abra <strong>APIs e serviços → Biblioteca</strong>.
+2. Procure por <strong>Google Drive API</strong>, abra e clique em <strong>Ativar</strong>.
+
+Sem isso, o login dá o erro <code>Google Drive API has not been used in project …</code>.
+
+<h2>3. Configurar a tela de consentimento</h2>
+
+1. Abra <strong>Google Auth Platform → Branding</strong> e clique em <strong>Começar</strong>.
+2. Preencha o <strong>nome do app</strong> (por exemplo, `Drive no Linux`) e o seu <strong>e-mail de suporte</strong>.
+3. Em <strong>Público-alvo</strong>, escolha <strong>Externo</strong>. Informe o e-mail de contato, aceite a política e clique em
+   <strong>Criar</strong>.
+4. De volta à página <strong>Branding</strong>:
+
+   - <strong>Não envie logotipo.</strong> Com logotipo, o Google exige uma verificação demorada antes de publicar.
+     Se já enviou, clique em <strong>Remover</strong>.
+   - Em <strong>Domínio do app</strong>, preencha com as páginas do site do projeto:
+
+     <table class="docs-table">
+     <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+     <tbody>
+     <tr><td>Página inicial do aplicativo</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/</code></td></tr>
+     <tr><td>Link da Política de Privacidade</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/docs/</code></td></tr>
+     <tr><td>Link dos Termos de Serviço</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/docs/</code></td></tr>
+     </tbody>
+     </table>
+
+   - Em <strong>Domínios autorizados</strong>, clique em <strong>Adicionar domínio</strong> e informe `tzanella.github.io`.
+   - Clique em <strong>Salvar</strong> no fim da página.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Você pode usar o seu próprio site</span>
+    <p>Esses campos são o que o Google mostra na tela de consentimento. Nada impede você de apontar
+    para o seu próprio domínio, desde que as páginas existam e sejam públicas. É o que os administradores
+    de domínio veem antes de liberar o app.</p>
+  </div>
+</div>
+
+<h2>4. Escolher as permissões (escopos)</h2>
+
+1. Abra <strong>Google Auth Platform → Acesso a dados</strong> e clique em <strong>Adicionar ou remover escopos</strong>.
+2. No fim do painel, em <strong>Adicionar escopos manualmente</strong>, cole os três, separados por vírgula, e
+   clique em <strong>Adicionar à tabela</strong>:
+
+   <div class="code-block"><code>https://www.googleapis.com/auth/drive
+openid
+email</code></div>
+
+3. Confira se os três ficaram marcados na tabela e clique em <strong>Atualizar</strong>.
+4. De volta à página, clique em <strong>Salvar</strong> no fim dela. <strong>Sem o Salvar, nada fica gravado.</strong>
+5. Ao final, `email` e `openid` aparecem em <strong>Escopos não confidenciais</strong> e o `drive` em
+   <strong>Seus escopos restritos</strong>.
+
+<table class="docs-table">
+<thead><tr><th>Escopo</th><th>Para que serve</th></tr></thead>
+<tbody>
+<tr><td><code>https://www.googleapis.com/auth/drive</code></td><td>Acesso ao Drive: listar, criar, mover e apagar arquivos. É o único escopo sensível — por isso fica em “Escopos restritos”.</td></tr>
+<tr><td><code>openid</code></td><td>Identifica a conta que está entrando (login social).</td></tr>
+<tr><td><code>email</code></td><td>Lê o e-mail da conta, usado para nomear a pasta da conta e identificar o usuário na tela de consentimento.</td></tr>
+</tbody>
+</table>
+
+<h2>5. Publicar o app</h2>
+
+1. Abra <strong>Google Auth Platform → Público-alvo</strong> e clique em <strong>Publicar app</strong>, depois em <strong>Confirmar</strong>.
+2. Se aparecer *“Para publicar o app, conclua a configuração na página de branding”*, falta algum campo
+   de <strong>Domínio do app</strong> ou há um logotipo enviado: volte ao passo 3 e salve de novo.
+3. Depois de publicar, o Google mostra *“Seu aplicativo precisa ser verificado”*. Pode ignorar: sem a
+   verificação, o app funciona para até 100 contas.
+
+<div class="callout callout-danger">
+  <div>🚨</div>
+  <div>
+    <span class="callout-title">Importante: não deixe o app “em teste”</span>
+    <p>Nesse modo o Google invalida o login a cada 7 dias, e só entram as contas adicionadas em
+    <strong>Usuários de teste</strong>. Em produção, sem verificação, o app continua privado: só quem
+    tiver o seu Client ID consegue usá-lo.</p>
+  </div>
+</div>
+
+<h2>6. Criar a credencial</h2>
+
+1. Abra <strong>APIs e serviços → Credenciais</strong>.
+2. Clique em <strong>Criar credenciais → ID do cliente OAuth</strong>.
+3. Em <strong>Tipo de aplicativo</strong>, escolha <strong>App para computador</strong>.
+4. Dê um nome (por exemplo, `Drive no Linux (Linux)`) e clique em <strong>Criar</strong>.
+5. Copie o <strong>ID do cliente</strong> e a <strong>Chave secreta do cliente</strong>. Você vai colá-los no primeiro login.
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">Tem que ser “App para computador”</span>
+    <p>Se você criar “Aplicativo da Web” ou “Android”, o login falha com
+    <code>redirect_uri_mismatch</code>. O app usa o fluxo de loopback (<code>127.0.0.1</code>) com PKCE,
+    que só funciona para o tipo “App para computador”.</p>
+  </div>
+</div>
+
+<h2>7. Primeiro login</h2>
+
+1. No primeiro uso do app, passe do guia (Continuar) e cole o ID e a chave secreta.
+2. O navegador abre a página de login do Google. Escolha a conta.
+3. Como o app não passou pela verificação do Google, aparece o aviso <strong>“O Google não verificou este app”</strong>.
+   Clique em <strong>Avançado → Acessar (nome do app) (não seguro)</strong>. O aviso existe porque o app é seu e não
+   foi enviado ao Google para revisão; os dados só trafegam entre o seu computador e o Google.
+4. Autorize o acesso ao Google Drive. A página mostra “Pronto! Pode fechar esta janela e voltar ao app.”
+
+<img src="../../assets/img/screenshots/primeiro-uso.png" alt="Tela de primeiro uso do app, com o guia do Client ID" class="mt-6 w-full rounded-xl border border-white/10" loading="lazy">
+
+<div class="callout callout-note">
+  <div>🔐</div>
+  <div>
+    <span class="callout-title">Onde isso fica guardado</span>
+    <p>O Client ID, o segredo, o token de acesso e o refresh token vão para o <strong>chaveiro do
+    sistema</strong> (KWallet ou GNOME Keyring), junto com o login. Nada é gravado em arquivo.</p>
+  </div>
+</div>
+
+<h2>Entrar pela linha de comando</h2>
+
+A CLI também aceita as credenciais sem passar pela interface:
+
+<div class="code-block"><code>gdrive-desktop-linux login \
+  --client-id SEU_CLIENT_ID \
+  --client-secret-file /caminho/para/o-segredo.txt</code></div>
+
+O arquivo do segredo evita que ele fique no histórico do shell. Para sair da conta:
+
+<div class="code-block"><code>gdrive-desktop-linux logout --all</code></div>
+
+<h2>Revogar a credencial</h2>
+
+Se o Client ID for comprometido (ou você só quiser recomeçar do zero):
+
+1. No [Google Cloud Console](https://console.cloud.google.com/), abra o projeto.
+2. Vá em <strong>APIs e serviços → Credenciais</strong> e clique na credencial criada.
+3. Clique em <strong>Excluir</strong>.
+4. Crie outra credencial do mesmo tipo e entre de novo no app.
+
+Para revogar apenas as sessões já autorizadas (sem apagar a credencial), use
+<strong>Google Account → Segurança → Third-party access → gerenciar</strong>.
+
+<h2>Problemas comuns</h2>
+
+<table class="docs-table">
+<thead><tr><th>Mensagem</th><th>O que fazer</th></tr></thead>
+<tbody>
+<tr><td>“Para publicar o app, conclua a configuração na página de branding”</td><td>Faltam a página inicial, a política ou o domínio autorizado, ou há um logotipo enviado. Corrija no passo 3, salve e publique de novo.</td></tr>
+<tr><td><code>access_denied</code> ou “acesso recusado”</td><td>Você clicou em Cancelar, ou o app ainda está “em teste” e a sua conta não está em <strong>Usuários de teste</strong>. Publique o app (passo 5) ou adicione a sua conta em Público-alvo → Usuários de teste.</td></tr>
+<tr><td><code>redirect_uri_mismatch</code></td><td>A credencial não é do tipo <strong>App para computador</strong>. Crie uma nova (passo 6).</td></tr>
+<tr><td>O login para de funcionar depois de uma semana</td><td>O app ficou “em teste”. Publique em produção (passo 5) e entre de novo.</td></tr>
+<tr><td>“Google Drive API has not been used in project…”</td><td>A Drive API não foi ativada no projeto (passo 2).</td></tr>
+<tr><td>“Acesso bloqueado: o aplicativo não está verificado”</td><td>É o aviso de app sem verificação. Clique em <strong>Avançado → Acessar (Drive no Linux) (não seguro)</strong>.</td></tr>
+<tr><td>Erro de SSL ao entrar</td><td>Proxy corporativo ou inspeção de TLS. Ajuste <code>ProxyServer</code> e <code>TrustedRootCertsFile</code> nas <a href="troubleshooting/">preferências</a>.</td></tr>
+</tbody>
+</table>
+
+<h2>Em organizações com políticas do Google</h2>
+
+Em contas geridas por uma organização, o administrador pode restringir quais apps podem acessar o
+Drive. Se o login for recusado com uma mensagem da sua empresa, o app respeita a política: escolha a conta
+permitida em <strong>Público-alvo → Usuários de teste</strong> e peça a liberação ao administrador da sua
+organização. O app também tem a preferência <code>AllowedAccountsPattern</code>, que limita quais contas
+entram — veja a <a href="features/">página de recursos</a>.
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-purple">Credentials</p>
+
+<h1>Google Cloud Client ID</h1>
+
+GDrive Desktop <strong>does not have an identity of its own on Google</strong>. Everyone creates their own, for free,
+in Google Cloud. It takes about ten minutes, it only has to be done once, and nobody but you uses the
+credential.
+
+The first run of the app brings this very guide, with a button that opens each Google Cloud page and
+buttons that copy the scopes and the consent screen URLs.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Why is it like this?</span>
+    <p>The project has no servers and receives none of your data. Without a Client ID of its own, anyone
+    using the app would share the same credential — and Google would revoke access for everyone as soon
+    as one account was compromised. With your own Client ID, only you use it, and you can revoke it
+    whenever you want.</p>
+  </div>
+</div>
+
+<h2>Summary in 6 steps</h2>
+
+<table class="docs-table">
+<thead><tr><th>#</th><th>Where in Google Cloud</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Project picker</td><td>Create a new project</td></tr>
+<tr><td>2</td><td>APIs &amp; Services → Library</td><td>Enable the <strong>Google Drive API</strong></td></tr>
+<tr><td>3</td><td>Google Auth Platform → Branding</td><td>Fill in the app and the domain</td></tr>
+<tr><td>4</td><td>Google Auth Platform → Data access</td><td>Add the <strong>3 scopes</strong></td></tr>
+<tr><td>5</td><td>Google Auth Platform → Audience</td><td><strong>Publish the app</strong></td></tr>
+<tr><td>6</td><td>APIs &amp; Services → Credentials</td><td>Create the <strong>OAuth client ID</strong> (Desktop app)</td></tr>
+</tbody>
+</table>
+
+<h2>1. Create a project</h2>
+
+1. Open the [Google Cloud Console](https://console.cloud.google.com/) with the Google account you are
+   going to use.
+2. In the project picker at the top of the page, click <strong>New project</strong>.
+3. Give it a name (for example, `Drive on Linux`) and click <strong>Create</strong>.
+4. Make sure the new project is <strong>selected</strong> before you continue — the console remembers the last
+   project used, and a wrong project here is the number one cause of trouble later on.
+
+<div class="callout callout-note">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Tip</span>
+    <p>One project per person is enough. If you use the app on several computers, use the same Client ID
+    on all of them.</p>
+  </div>
+</div>
+
+<h2>2. Enable the Google Drive API</h2>
+
+1. In the side menu, open <strong>APIs &amp; Services → Library</strong>.
+2. Search for <strong>Google Drive API</strong>, open it and click <strong>Enable</strong>.
+
+Without this, the login fails with <code>Google Drive API has not been used in project …</code>.
+
+<h2>3. Configure the consent screen</h2>
+
+1. Open <strong>Google Auth Platform → Branding</strong> and click <strong>Get started</strong>.
+2. Fill in the <strong>app name</strong> (for example, `Drive on Linux`) and your <strong>support email</strong>.
+3. Under <strong>Audience</strong>, choose <strong>External</strong>. Enter the contact email, accept the policy and click
+   <strong>Create</strong>.
+4. Back on the <strong>Branding</strong> page:
+
+   - <strong>Do not upload a logo.</strong> With a logo, Google requires a lengthy verification before publishing.
+     If you already uploaded one, click <strong>Remove</strong>.
+   - Under <strong>App domain</strong>, fill in the project site pages:
+
+     <table class="docs-table">
+     <thead><tr><th>Field</th><th>Value</th></tr></thead>
+     <tbody>
+     <tr><td>Application home page</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/</code></td></tr>
+     <tr><td>Application privacy policy link</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/docs/</code></td></tr>
+     <tr><td>Application terms of service link</td><td><code>https://tzanella.github.io/gdrive-desktop-linux/docs/</code></td></tr>
+     </tbody>
+     </table>
+
+   - Under <strong>Authorized domains</strong>, click <strong>Add domain</strong> and enter `tzanella.github.io`.
+   - Click <strong>Save</strong> at the bottom of the page.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">You can use your own site</span>
+    <p>These fields are what Google shows on the consent screen. Nothing stops you from pointing to your
+    own domain, as long as the pages exist and are public. It is what domain administrators see before
+    allowing the app.</p>
+  </div>
+</div>
+
+<h2>4. Choose the permissions (scopes)</h2>
+
+1. Open <strong>Google Auth Platform → Data access</strong> and click <strong>Add or remove scopes</strong>.
+2. At the bottom of the panel, under <strong>Manually add scopes</strong>, paste the three, separated by commas, and
+   click <strong>Add to table</strong>:
+
+   <div class="code-block"><code>https://www.googleapis.com/auth/drive
+openid
+email</code></div>
+
+3. Check that all three are ticked in the table and click <strong>Update</strong>.
+4. Back on the page, click <strong>Save</strong> at the bottom. <strong>Nothing is stored without the Save.</strong>
+5. In the end, `email` and `openid` show up under <strong>Non-sensitive scopes</strong> and `drive` under
+   <strong>Your restricted scopes</strong>.
+
+<table class="docs-table">
+<thead><tr><th>Scope</th><th>What it is for</th></tr></thead>
+<tbody>
+<tr><td><code>https://www.googleapis.com/auth/drive</code></td><td>Drive access: list, create, move and delete files. It is the only sensitive scope — which is why it sits under restricted scopes.</td></tr>
+<tr><td><code>openid</code></td><td>Identifies the account signing in (social login).</td></tr>
+<tr><td><code>email</code></td><td>Reads the account e-mail, used to name the account folder and to identify the user on the consent screen.</td></tr>
+</tbody>
+</table>
+
+<h2>5. Publish the app</h2>
+
+1. Open <strong>Google Auth Platform → Audience</strong> and click <strong>Publish app</strong>, then <strong>Confirm</strong>.
+2. If you see *“To publish the app, complete the configuration in the branding page”*, some <strong>App domain</strong>
+   field is missing or a logo was uploaded: go back to step 3 and save again.
+3. After publishing, Google shows *“Your app needs verification”*. You can ignore it: without
+   verification, the app works for up to 100 accounts.
+
+<div class="callout callout-danger">
+  <div>🚨</div>
+  <div>
+    <span class="callout-title">Important: do not leave the app in “testing”</span>
+    <p>In that mode Google invalidates the login every 7 days, and only the accounts added under
+    <strong>Test users</strong> can get in. In production, without verification, the app stays private:
+    only whoever has your Client ID can use it.</p>
+  </div>
+</div>
+
+<h2>6. Create the credential</h2>
+
+1. Open <strong>APIs &amp; Services → Credentials</strong>.
+2. Click <strong>Create credentials → OAuth client ID</strong>.
+3. Under <strong>Application type</strong>, choose <strong>Desktop app</strong>.
+4. Give it a name (for example, `Drive on Linux (Linux)`) and click <strong>Create</strong>.
+5. Copy the <strong>Client ID</strong> and the <strong>Client secret</strong>. You will paste them on the first login.
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">It has to be a “Desktop app”</span>
+    <p>If you create a “Web application” or an Android one, the login fails with
+    <code>redirect_uri_mismatch</code>. The app uses the loopback flow (<code>127.0.0.1</code>) with PKCE,
+    which only works for the Desktop app type.</p>
+  </div>
+</div>
+
+<h2>7. First login</h2>
+
+1. On the first run of the app, move past the guide (Continue) and paste the ID and the client secret.
+2. The browser opens the Google sign-in page. Choose the account.
+3. Since the app did not go through Google's verification, you see the warning <strong>“Google hasn't verified
+   this app”</strong>. Click <strong>Advanced → Go to Drive on Linux (unsafe)</strong>. The warning exists because the app is
+   yours and was not submitted to Google for review; data only travels between your computer and Google.
+4. Authorize access to Google Drive. The page shows “Done! You may close this window and return to the
+   app.”
+
+<img src="../../assets/img/screenshots/primeiro-uso.png" alt="First run screen of the app, with the Client ID guide" class="mt-6 w-full rounded-xl border border-white/10" loading="lazy">
+
+<div class="callout callout-note">
+  <div>🔐</div>
+  <div>
+    <span class="callout-title">Where this is stored</span>
+    <p>The Client ID, the secret, the access token and the refresh token go into the <strong>system
+    keyring</strong> (KWallet or GNOME Keyring), together with the login. Nothing is written to a file.</p>
+  </div>
+</div>
+
+<h2>Signing in from the command line</h2>
+
+The CLI also takes the credentials without going through the UI:
+
+<div class="code-block"><code>gdrive-desktop-linux login \
+  --client-id YOUR_CLIENT_ID \
+  --client-secret-file /path/to/the-secret.txt</code></div>
+
+Using a file for the secret keeps it out of your shell history. To sign out:
+
+<div class="code-block"><code>gdrive-desktop-linux logout --all</code></div>
+
+<h2>Revoking the credential</h2>
+
+If the Client ID is compromised (or you just want to start over):
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), open your project.
+2. Go to <strong>APIs &amp; Services → Credentials</strong> and click the credential you created.
+3. Click <strong>Delete</strong>.
+4. Create another credential of the same type and sign in again.
+
+To revoke only the already authorized sessions (without deleting the credential), use
+<strong>Google Account → Security → Third-party access → Manage</strong>.
+
+<h2>Common problems</h2>
+
+<table class="docs-table">
+<thead><tr><th>Message</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>“To publish the app, complete the configuration in the branding page”</td><td>The home page, the policy or the authorized domain is missing, or a logo was uploaded. Fix it in step 3, save and publish again.</td></tr>
+<tr><td><code>access_denied</code> or “Access denied”</td><td>You clicked Cancel, or the app is still in testing and your account is not under <strong>Test users</strong>. Publish the app (step 5) or add your account under Audience → Test users.</td></tr>
+<tr><td><code>redirect_uri_mismatch</code></td><td>The credential is not a <strong>Desktop app</strong>. Create a new one (step 6).</td></tr>
+<tr><td>The login stops working after a week</td><td>The app was left in testing. Publish it to production (step 5) and sign in again.</td></tr>
+<tr><td>“Google Drive API has not been used in project…”</td><td>The Drive API was not enabled on the project (step 2).</td></tr>
+<tr><td>“Access blocked: This app isn’t verified”</td><td>That is the unverified app warning. Click <strong>Advanced → Go to Drive on Linux (unsafe)</strong>.</td></tr>
+<tr><td>SSL error while signing in</td><td>Corporate proxy or TLS inspection. Adjust <code>ProxyServer</code> and <code>TrustedRootCertsFile</code> in the <a href="troubleshooting/">preferences</a>.</td></tr>
+</tbody>
+</table>
+
+<h2>In organizations with Google policies</h2>
+
+On accounts managed by an organization, the administrator can restrict which apps may access Drive. If
+the sign-in is refused with a message from your company, the app respects the policy: pick the allowed
+account under <strong>Audience → Test users</strong> and ask your administrator for access. The app also has the
+<code>AllowedAccountsPattern</code> preference, which limits which accounts may sign in — see the
+<a href="features/">features page</a>.
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

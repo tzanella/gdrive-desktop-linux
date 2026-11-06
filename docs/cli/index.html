@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLI e servidor MCP · Documentação</title>
+<meta name="description" content="Referência da linha de comando do GDrive Desktop e do servidor MCP para assistentes de IA.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="cli">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Automação</p>
+
+<h1>CLI e servidor MCP</h1>
+
+O app instala um programa de linha de comando, `gdrive-desktop-linux`, que conversa com o mesmo serviço
+do app por D-Bus. Tudo o que a janela faz, a CLI faz — inclusive em scripts.
+
+<div class="code-block"><code>gdrive-desktop-linux --help</code></div>
+
+<h2>Todos os comandos</h2>
+
+<table class="docs-table">
+<thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td><code>login</code></td><td>Conecta uma conta Google, abrindo o navegador para autorizar.</td></tr>
+<tr><td><code>status [--account &lt;e-mail&gt;]</code></td><td>Mostra a conta, a pasta e o estado da sincronização (envios pendentes).</td></tr>
+<tr><td><code>pin &lt;caminho&gt;</code></td><td>Deixa um arquivo ou pasta disponível off-line.</td></tr>
+<tr><td><code>unpin &lt;caminho&gt;</code></td><td>Volta a deixar só on-line (libera o espaço).</td></tr>
+<tr><td><code>pause</code></td><td>Pausa a sincronização.</td></tr>
+<tr><td><code>resume</code></td><td>Retoma a sincronização.</td></tr>
+<tr><td><code>sync [--account &lt;e-mail&gt;] [--folder &lt;id&gt;]</code></td><td>Força a sincronização imediata de tudo ou de uma pasta específica.</td></tr>
+<tr><td><code>lost-and-found [--account &lt;e-mail&gt;]</code></td><td>Lista as edições guardadas por conflito.</td></tr>
+<tr><td><code>logout [--account &lt;e-mail&gt;] [--all]</code></td><td>Sai de uma conta ou de todas, decidindo o que fazer com os envios pendentes.</td></tr>
+<tr><td><code>open-pointer &lt;arquivo&gt;</code></td><td>Abre um <code>.gdoc</code>, <code>.gsheet</code>… no navegador (é o que o duplo clique faz).</td></tr>
+<tr><td><code>menu-action &lt;ação&gt; &lt;caminho&gt;…</code></td><td>Executa uma ação do menu do botão direito (usado pelo COSMIC Files).</td></tr>
+<tr><td><code>uninstall [--purge] [--yes]</code></td><td>Desinstala o app; <code>--purge</code> apaga também os dados deste computador.</td></tr>
+</tbody>
+</table>
+
+<h2>Exemplos</h2>
+
+<h3>Entrar e ver o estado</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux login
+gdrive-desktop-linux status</code></div>
+
+Para entrar sem passar pela interface, com o segredo em arquivo (fora do histórico do shell):
+
+<div class="code-block"><code>gdrive-desktop-linux login \
+  --client-id SEU_CLIENT_ID \
+  --client-secret-file ~/.config/gdrive/client-secret.txt</code></div>
+
+<h3>Deixar um arquivo disponível off-line</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux pin "~/Google Drive/Meu Drive/Relatórios"
+gdrive-desktop-linux unpin "~/Google Drive/Meu Drive/Filmes"</code></div>
+
+<h3>Controlar a sincronização num script</h3>
+
+<div class="code-block"><code># pausa enquanto a reunião acontece
+gdrive-desktop-linux pause
+sleep 3600
+gdrive-desktop-linux resume</code></div>
+
+<h3>Sair da conta com envios pendentes</h3>
+
+Há três saídas possíveis, e elas se combinam:
+
+<div class="code-block"><code># espera os envios pendentes terminarem e sai
+gdrive-desktop-linux logout --finish
+
+# copia os arquivos com envio pendente para uma pasta antes de sair
+gdrive-desktop-linux logout --move ~/Documentos/pendentes
+
+# descarta os envios pendentes
+gdrive-desktop-linux logout --discard
+
+# sai de todas as contas
+gdrive-desktop-linux logout --all</code></div>
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">O Lost and Found nunca é apagado</span>
+    <p>Mesmo com <code>--discard</code>, as versões guardadas por conflito ficam.</p>
+  </div>
+</div>
+
+<h3>Forçar uma sincronização</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux sync
+gdrive-desktop-linux sync --folder 1A2b3C4D5E6F</code></div>
+
+O <code>--folder</code> recebe o ID numérico da pasta (o mesmo que aparece no link do Drive).
+
+<h2>Servidor MCP</h2>
+
+O programa `gdrive-desktop-linux-mcp` deixa um assistente de IA compatível com o <strong>Model Context
+Protocol</strong> (Claude Desktop, Claude Code e outros) consultar e organizar o Drive pelo serviço do app,
+<strong>sem credencial própria</strong>.
+
+O que o assistente pode fazer:
+
+<table class="docs-table">
+<thead><tr><th>Ação</th><th>Descrição</th></tr></thead>
+<tbody>
+<tr><td>Estado de um caminho</td><td>Se aquele caminho está sincronizado, offline ou com erro.</td></tr>
+<tr><td>Link da web</td><td>O endereço do item no Google Drive.</td></tr>
+<tr><td>Pastas acompanhadas</td><td>Quais pastas do computador estão sincronizadas.</td></tr>
+<tr><td>Compartilhar</td><td>Abre a janela Compartilhar com o e-mail <strong>já digitado</strong> — nada é compartilhado sem você confirmar.</td></tr>
+<tr><td>Adicionar pasta</td><td>Adiciona uma pasta à sincronização: <code>backup</code> (cópia em “Computadores”, a pasta fica onde está) ou <code>stream</code> (a pasta vai para o Meu Drive e um link fica no lugar; a original vai para a lixeira do sistema).</td></tr>
+</tbody>
+</table>
+
+O servidor só aceita pastas visíveis dentro da sua pasta pessoal.
+
+<h3>Registrar no Claude Code</h3>
+
+<div class="code-block"><code>claude mcp add google-drive -- gdrive-desktop-linux-mcp</code></div>
+
+<h3>Registrar em outro cliente MCP</h3>
+
+```json
+{
+  "mcpServers": {
+    "google-drive": { "command": "gdrive-desktop-linux-mcp" }
+  }
+}
+```
+
+<h2>Limitações conhecidas</h2>
+
+<table class="docs-table">
+<thead><tr><th>Situação</th><th>Comportamento</th></tr></thead>
+<tbody>
+<tr><td>Vim e Neovim com <code>backupcopy=auto</code></td><td>Salvam renomeando o original e criando outro: o conteúdo não se perde, mas no Drive o arquivo ganha um ID novo e o antigo vai para a lixeira (links compartilhados do antigo deixam de valer). Com <code>set backupcopy=yes</code> o ID se mantém.</td></tr>
+<tr><td>Pasta criada que ainda não subiu e vai para a lixeira</td><td>Some só deste computador.</td></tr>
+<tr><td>Conta que ainda não terminou a primeira leitura do Drive</td><td>Fica fora da lista até a próxima partida, se não conseguir subir logo no começo.</td></tr>
+<tr><td>Modo Espelho</td><td>Os Drives compartilhados continuam na pasta do Google Drive, em Stream.</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-blue">Automation</p>
+
+<h1>CLI and MCP server</h1>
+
+The app installs a command line program, `gdrive-desktop-linux`, which talks to the same service as the
+app over D-Bus. Everything the window does, the CLI does — including inside scripts.
+
+<div class="code-block"><code>gdrive-desktop-linux --help</code></div>
+
+<h2>All the commands</h2>
+
+<table class="docs-table">
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>login</code></td><td>Connects a Google account, opening the browser to authorize.</td></tr>
+<tr><td><code>status [--account &lt;e-mail&gt;]</code></td><td>Shows the account, the folder and the sync state (pending uploads).</td></tr>
+<tr><td><code>pin &lt;path&gt;</code></td><td>Makes a file or folder available offline.</td></tr>
+<tr><td><code>unpin &lt;path&gt;</code></td><td>Goes back to online only (frees the space).</td></tr>
+<tr><td><code>pause</code></td><td>Pauses the synchronization.</td></tr>
+<tr><td><code>resume</code></td><td>Resumes the synchronization.</td></tr>
+<tr><td><code>sync [--account &lt;e-mail&gt;] [--folder &lt;id&gt;]</code></td><td>Forces an immediate sync of everything or of a specific folder.</td></tr>
+<tr><td><code>lost-and-found [--account &lt;e-mail&gt;]</code></td><td>Lists the edits kept from conflicts.</td></tr>
+<tr><td><code>logout [--account &lt;e-mail&gt;] [--all]</code></td><td>Signs out of one account or all of them, deciding what to do with pending uploads.</td></tr>
+<tr><td><code>open-pointer &lt;file&gt;</code></td><td>Opens a <code>.gdoc</code>, <code>.gsheet</code>… in the browser (what the double click does).</td></tr>
+<tr><td><code>menu-action &lt;action&gt; &lt;path&gt;…</code></td><td>Runs a right-click menu action (used by COSMIC Files).</td></tr>
+<tr><td><code>uninstall [--purge] [--yes]</code></td><td>Uninstalls the app; <code>--purge</code> also wipes the data on this computer.</td></tr>
+</tbody>
+</table>
+
+<h2>Examples</h2>
+
+<h3>Sign in and check the state</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux login
+gdrive-desktop-linux status</code></div>
+
+To sign in without going through the UI, with the secret in a file (out of your shell history):
+
+<div class="code-block"><code>gdrive-desktop-linux login \
+  --client-id YOUR_CLIENT_ID \
+  --client-secret-file ~/.config/gdrive/client-secret.txt</code></div>
+
+<h3>Making a file available offline</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux pin "~/Google Drive/My Drive/Reports"
+gdrive-desktop-linux unpin "~/Google Drive/My Drive/Movies"</code></div>
+
+<h3>Controlling the sync from a script</h3>
+
+<div class="code-block"><code># pause while the meeting happens
+gdrive-desktop-linux pause
+sleep 3600
+gdrive-desktop-linux resume</code></div>
+
+<h3>Signing out with pending uploads</h3>
+
+There are three possible ways out, and they combine:
+
+<div class="code-block"><code># wait for the pending uploads to finish and sign out
+gdrive-desktop-linux logout --finish
+
+# copy the files with pending upload to a folder before signing out
+gdrive-desktop-linux logout --move ~/Documents/pending
+
+# discard the pending uploads
+gdrive-desktop-linux logout --discard
+
+# sign out of all the accounts
+gdrive-desktop-linux logout --all</code></div>
+
+<div class="callout callout-warn">
+  <div>⚠️</div>
+  <div>
+    <span class="callout-title">Lost and Found is never deleted</span>
+    <p>Even with <code>--discard</code>, the versions kept from conflicts stay.</p>
+  </div>
+</div>
+
+<h3>Forcing a sync</h3>
+
+<div class="code-block"><code>gdrive-desktop-linux sync
+gdrive-desktop-linux sync --folder 1A2b3C4D5E6F</code></div>
+
+The <code>--folder</code> takes the numeric folder ID (the same one you see in the Drive link).
+
+<h2>MCP server</h2>
+
+The `gdrive-desktop-linux-mcp` program lets an AI assistant compatible with the <strong>Model Context
+Protocol</strong> (Claude Desktop, Claude Code and others) query and organize the Drive through the app
+service, <strong>with no credentials of its own</strong>.
+
+What the assistant can do:
+
+<table class="docs-table">
+<thead><tr><th>Action</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Status of a path</td><td>Whether that path is synced, offline or in error.</td></tr>
+<tr><td>Web link</td><td>The address of the item on Google Drive.</td></tr>
+<tr><td>Watched folders</td><td>Which computer folders are being synced.</td></tr>
+<tr><td>Share</td><td>Opens the Share window with the e-mail <strong>already typed</strong> — nothing is shared without your confirmation.</td></tr>
+<tr><td>Add a folder</td><td>Adds a folder to the sync: <code>backup</code> (copy into “Computers”, the folder stays where it is) or <code>stream</code> (the folder goes to My Drive and a link is left in its place; the original goes to the system trash).</td></tr>
+</tbody>
+</table>
+
+The server only accepts folders visible inside your personal folder.
+
+<h3>Registering it in Claude Code</h3>
+
+<div class="code-block"><code>claude mcp add google-drive -- gdrive-desktop-linux-mcp</code></div>
+
+<h3>Registering it in another MCP client</h3>
+
+```json
+{
+  "mcpServers": {
+    "google-drive": { "command": "gdrive-desktop-linux-mcp" }
+  }
+}
+```
+
+<h2>Known limitations</h2>
+
+<table class="docs-table">
+<thead><tr><th>Situation</th><th>Behavior</th></tr></thead>
+<tbody>
+<tr><td>Vim and Neovim with <code>backupcopy=auto</code></td><td>They save by renaming the original and creating another: no content is lost, but on the Drive the file gets a new ID and the old one goes to the trash (shared links of the old file stop working). With <code>set backupcopy=yes</code> the ID is kept.</td></tr>
+<tr><td>A folder created that has not uploaded yet and is trashed</td><td>It disappears only from this computer.</td></tr>
+<tr><td>An account that has not finished its first read of the Drive</td><td>It stays out of the list until the next start, if it cannot upload right away.</td></tr>
+<tr><td>Mirror mode</td><td>Shared drives stay in the Google Drive folder, in Stream.</td></tr>
+</tbody>
+</table>
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

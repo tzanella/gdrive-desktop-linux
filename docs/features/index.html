@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursos do app · Documentação</title>
+<meta name="description" content="Referência completa dos recursos do GDrive Desktop: pasta do Drive, off-line, sincronização, contas, backup, proteção e preferências.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="features">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-green">Referência</p>
+
+<h1>Recursos do app</h1>
+
+Tudo o que o GDrive Desktop faz, organizado por área. Cada item aqui corresponde a um item do
+aplicativo oficial para Windows.
+
+<h2>1. A pasta do Drive</h2>
+
+O app monta o seu Drive como uma pasta virtual via <strong>FUSE</strong>:
+
+<table class="docs-table">
+<thead><tr><th>Pasta</th><th>Conteúdo</th></tr></thead>
+<tbody>
+<tr><td><code>~/Google Drive/Meu Drive</code></td><td>O Meu Drive inteiro.</td></tr>
+<tr><td><code>~/Google Drive/Drives compartilhados</code></td><td>Os Drives compartilhados da conta (só existe se a conta tiver algum).</td></tr>
+<tr><td><code>~/Google Drive/Computadores</code></td><td>As cópias das pastas do computador sincronizadas.</td></tr>
+<tr><td><code>~/Google Drive/.Lixeira do Drive</code></td><td>A lixeira do Drive, somente leitura.</td></tr>
+<tr><td><code>~/Google Drive/Lost and Found</code></td><td>Versões conflitantes e edições que não subiram.</td></tr>
+</tbody>
+</table>
+
+<h3>Modo Stream (padrão)</h3>
+
+Os arquivos <strong>ficam na nuvem</strong>. Quando você abre um, só os trechos lidos são baixados — abrir um vídeo
+de 2 GB baixa o pedaço que você está vendo. É o modo que economiza mais espaço.
+
+<h3>Modo Espelho</h3>
+
+Em <strong>Preferências › Google Drive › Espelhar arquivos</strong>, o Meu Drive inteiro vira uma pasta comum do
+computador, disponível mesmo sem internet. Antes de confirmar, a janela mostra quanto será baixado e
+quanto espaço livre existe.
+
+<strong>Fazer streaming dos arquivos</strong> volta ao modo anterior depois que tudo o que foi alterado subir — e
+pode mandar a pasta do Espelho para a lixeira do sistema, se você permitir.
+
+<div class="callout callout-note">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Sem limite de tamanho</span>
+    <p>Não existe o limite de 4 GB por arquivo que a unidade virtual do Windows impõe. Aqui o limite é o
+    da nuvem.</p>
+  </div>
+</div>
+
+<h2>2. Arquivos sob demanda e off-line</h2>
+
+- <strong>Disponível off-line</strong> marca um arquivo ou pasta para ficar no disco.
+- <strong>Somente on-line</strong> desfaz e libera o espaço na hora, sem mexer no que está aberto ou com envio pendente.
+- O estado pode ficar <strong>misto</strong> (parte no disco, parte na nuvem) e a tela mostra isso.
+- O cache guarda o conteúdo em blocos de 1 MiB, com janelas que crescem na leitura sequencial.
+
+A tela <strong>Arquivos off-line</strong> mostra o que está no computador e o espaço usado. Trocar a pasta do cache
+nas configurações leva os arquivos baixados para o lugar novo <strong>sem reiniciar o app</strong>, com um aviso que
+mostra a porcentagem.
+
+<h2>3. Sincronização</h2>
+
+- Envio e recebimento <strong>automáticos</strong>.
+- <strong>Fila que sobrevive a reinícios</strong> e a quedas de rede: os envios pendentes ficam no disco.
+- <strong>Conflitos</strong> guardados no Lost and Found — nunca sobrescritos em silêncio.
+- <strong>Lixeira</strong>: excluir da pasta do Drive manda para a lixeira do Drive (30 dias).
+- <strong>Limites de banda</strong> de envio e download.
+- <strong>Pausa e retomada</strong> a qualquer momento, pela bandeja ou pela janela.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Restaurar da lixeira</span>
+    <p>A pasta <code>.Lixeira do Drive</code> é somente leitura. Para restaurar, arraste o item para uma
+    pasta do Drive (se já existir um arquivo com o mesmo nome, os dois ficam). A lixeira do Dolphin
+    também restaura o que foi mandado por ela.</p>
+  </div>
+</div>
+
+<h2>4. Documentos Google</h2>
+
+Docs, Planilhas e Apresentações aparecem na pasta como ponteiros (`.gdoc`, `.gsheet`, `.gslides`) e
+<strong>abrem no navegador com duplo clique</strong>. Copiar um ponteiro para outra pasta cria um atalho do Drive e
+avisa que o arquivo original continua na pasta de origem.
+
+<h2>5. Bandeja e janela principal</h2>
+
+A <strong>bandeja</strong> mostra o estado da sincronização e traz: pausar/retomar, pesquisa (também pelo atalho
+global, quando o portal do KDE aceita), lista de erros, arquivos off-line, preferências e sair.
+
+A <strong>janela principal</strong> tem:
+
+<table class="docs-table">
+<thead><tr><th>Seção</th><th>O que mostra</th></tr></thead>
+<tbody>
+<tr><td>Cabeçalho</td><td>O estado da sincronização, a última sincronização e o botão Pausar/Retomar.</td></tr>
+<tr><td>Início</td><td>O que precisa de atenção, os arquivos off-line, os compartilhados com você e o estado da sincronização.</td></tr>
+<tr><td>Atividade de sincronização</td><td>O que subiu, desceu ou foi para a lixeira, com o menu de cada linha (abrir, copiar link, compartilhar, cancelar um envio).</td></tr>
+<tr><td>Pastas conectadas</td><td>As pastas do computador que estão sincronizadas.</td></tr>
+<tr><td>Drives compartilhados</td><td>Abrir cada drive na pasta ou na web.</td></tr>
+<tr><td>Notificações</td><td>O histórico de avisos.</td></tr>
+<tr><td>Mais opções</td><td>Arquivos off-line, lista de erros, preferências, gerenciar drives compartilhados, desconectar todas as contas e sair.</td></tr>
+</tbody>
+</table>
+
+<img src="../../assets/img/screenshots/janela-principal.png" alt="Janela principal do app" class="mt-6 w-full rounded-xl border border-white/10" loading="lazy">
+
+<h2>6. Primeiro uso e tour</h2>
+
+Sem conta, o app abre o <strong>primeiro uso</strong>: um guia do Client ID com botões que abrem cada página do
+Google Cloud e copiam os valores, o <strong>Resumo</strong> do que foi escolhido e o <strong>tour</strong> da janela principal
+(que também fica nas Preferências).
+
+<h2>7. Miniaturas</h2>
+
+As imagens aparecem <strong>com miniatura no Dolphin e em outros gerenciadores</strong>, usando as miniaturas do
+próprio Google — sem baixar os arquivos. As miniaturas ficam no cache padrão do freedesktop
+(`~/.cache/thumbnails`).
+
+<h2>8. Menu do botão direito</h2>
+
+Nos arquivos e pastas do Drive aparece o submenu <strong>Google Drive</strong>:
+
+- Abrir no navegador
+- Compartilhar
+- Copiar link (o aviso diz <strong>quem pode abrir</strong>)
+- Gerenciar versões
+- Adicionar atalho ao Drive
+- Disponível off-line / Somente on-line (marcado conforme o estado atual)
+- Novo Documento, Planilha ou Apresentação Google na pasta
+- Atualizar a pasta
+- Ver a lixeira
+
+Fora da pasta do Drive o submenu não aparece. Veja a página de
+<a href="file-managers/">gerenciadores de arquivos</a> para os detalhes de cada um.
+
+<h2>9. Compartilhar e gerenciar versões</h2>
+
+A janela <strong>Compartilhar</strong> traz pessoas, papéis (leitor, comentador, editor), acesso geral e link. A
+janela <strong>Gerenciar versões</strong> lista as versões guardadas de um arquivo, da atual para a mais antiga, e
+deixa <strong>baixar</strong>, <strong>restaurar</strong> ou <strong>manter para sempre</strong>.
+
+<div class="callout callout-note">
+  <div>ℹ️</div>
+  <div>
+    <span class="callout-title">Diferença inevitável</span>
+    <p>No app oficial, as versões ficam numa pasta oculta. Aqui, o botão direito abre a janela
+    “Gerenciar versões”.</p>
+  </div>
+</div>
+
+<h2>10. Contas</h2>
+
+- Até <strong>4 contas Google</strong> ao mesmo tempo, cada uma com a sua pasta
+  (`~/Google Drive (<e-mail>)` a partir da segunda) e sincronizando ao mesmo tempo.
+- Troca de conta pelo menu da conta (a foto no alto da janela).
+- Quando o acesso de uma conta expira, ela aparece com <strong>Entrar de novo</strong>; as outras continuam.
+- Em <strong>Mais opções</strong> há <strong>Desconectar todas as contas</strong>.
+- Em <strong>Preferências › Google Drive › Alterar</strong> você muda a pasta da conta mostrada.
+
+<h2>11. Drives compartilhados</h2>
+
+- Aparecem na pasta de cada conta e numa <strong>visão própria</strong> na janela principal.
+- A janela <strong>Gerenciar drives compartilhados</strong> escolhe quais drives aparecem e cria um novo.
+- Mover um arquivo para um Drive compartilhado muda quem pode vê-lo: o app avisa <strong>depois</strong> da
+  movimentação, porque uma pasta montada não tem como perguntar no meio de um `mv`.
+- Os Drives compartilhados continuam em <strong>Stream</strong> mesmo no modo Espelho, como no app oficial.
+
+<h2>12. Pastas do computador e backup de dispositivos</h2>
+
+Em <strong>Preferências › Meu computador › Adicionar pasta</strong>, uma pasta do computador é sincronizada com
+`Computadores/<este computador>` no Drive, nos dois sentidos. A aba sugere pastas comuns (Documentos,
+Imagens, Vídeos) para adicionar com um clique.
+
+Nada é apagado de vez: o que você exclui no computador vai para a lixeira do Drive, e o que sai do Drive
+vai para a lixeira do sistema. Se muitos arquivos somem de uma vez, a pasta para e pergunta antes.
+
+<strong>Pandrives e cartões de memória</strong>: quando um dispositivo é conectado, o app pergunta se quer fazer
+backup. O backup só envia (nada é apagado do dispositivo nem do Drive) e vai para
+`Computadores/<este computador>/<nome do dispositivo>`.
+
+Pastas de rede (NAS) <strong>não podem</strong> ser sincronizadas: o app recusa volumes de rede e FUSE.
+
+<h2>13. Proteção e recuperação</h2>
+
+<h3>Atividade suspeita</h3>
+
+Se muitos arquivos forem regravados de um jeito que lembra um vírus que cifra arquivos, ou renomeados
+para extensões de arquivo cifrado (`.locked` e similares), o app <strong>pausa os envios da conta</strong> e avisa.
+Fotos, vídeos, `.zip` e outros formatos já comprimidos não contam.
+
+No aviso: <strong>Verificar</strong> abre a janela principal, <strong>Eu reconheço esta atividade</strong> retoma e não avisa de
+novo por uma hora, e <strong>Permitir sincronização</strong> retoma.
+
+<h3>Itens recuperados</h3>
+
+Se os dados do app de uma conta se danificarem (queda de energia, disco com defeito), eles são guardados
+numa pasta `recuperacao` e a conta é lida de novo do Drive. As edições que ainda não tinham subido vão
+para o <strong>Lost and Found</strong>, na pasta “Recuperados &lt;data&gt;”. Nada é reenviado sozinho: mova de volta
+para a pasta do Drive o que quiser manter.
+
+<h2>14. Avisos e notificações</h2>
+
+O app avisa sobre: falta de permissão, conta bloqueada, armazenamento quase cheio, disco cheio, envios
+parados há dias, itens recuperados, limites do Drive, login bloqueado pela organização, itens movidos
+para onde outras pessoas veem e nova versão do app. Cada tipo pode ser <strong>desligado</strong> nas preferências de
+notificação (`DoNotShowNotifications`).
+
+<h2>15. Diagnóstico e feedback</h2>
+
+Em <strong>Mais opções</strong>:
+
+- <strong>Enviar feedback</strong> abre no navegador uma issue do projeto já preenchida com a versão e o sistema.
+- <strong>Gerar informações de diagnóstico</strong> grava na Área de trabalho um `.tar.gz` com os registros, o sistema
+  e as preferências — <strong>sem tokens, senhas nem e-mails inteiros</strong>.
+- <strong>Ativar o registro detalhado</strong> grava mais detalhes nos registros por um dia.
+- <strong>Redefinir os dados locais</strong> apaga os dados do app da conta neste computador e a lê de novo do Drive,
+  com o mesmo login (só sem envios pendentes).
+
+Com <strong>Enviar relatórios de erro automaticamente</strong> ligado, depois de uma falha o app oferece abrir a issue
+com o relatório — quem envia é você.
+
+<h2>16. Preferências</h2>
+
+As preferências ficam em `~/.config/gdrive-desktop-linux/preferences.toml` e podem ser editadas à mão
+(um arquivo ilegível não derruba o app: ele avisa no registro e usa o padrão até você corrigir).
+
+<table class="docs-table">
+<thead><tr><th>Chave</th><th>O que faz</th><th>Padrão</th></tr></thead>
+<tbody>
+<tr><td><code>AllowedAccountsPattern</code></td><td>Regex dos e-mails que podem entrar.</td><td>—</td></tr>
+<tr><td><code>AutoStartOnLogin</code></td><td>Inicia a bandeja junto com o sistema.</td><td><code>true</code></td></tr>
+<tr><td><code>AutomaticErrorReporting</code></td><td>Oferece enviar relatórios de erro automaticamente.</td><td><code>false</code></td></tr>
+<tr><td><code>BandwidthRxKBPS</code></td><td>Limite de download, em KB/s.</td><td>—</td></tr>
+<tr><td><code>BandwidthTxKBPS</code></td><td>Limite de envio, em KB/s.</td><td>—</td></tr>
+<tr><td><code>ContentCacheMaxKbytes</code></td><td>Tamanho máximo do cache de conteúdo.</td><td>—</td></tr>
+<tr><td><code>ContentCachePath</code></td><td>Pasta do cache de conteúdo.</td><td>—</td></tr>
+<tr><td><code>DefaultMountPoint</code></td><td>Pasta onde o Drive é montado.</td><td>—</td></tr>
+<tr><td><code>DefaultWebBrowser</code></td><td>Navegador usado para abrir o login e os documentos.</td><td>—</td></tr>
+<tr><td><code>DirectConnection</code></td><td>Conecta direto, sem proxy.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableAddAccount</code></td><td>Impede adicionar contas.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableCRLCheck</code></td><td>Não consulta a lista de revogação de certificados.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableExternalMediaSync</code></td><td>Desliga o backup de dispositivos externos.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableLocalizedVirtualFolders</code></td><td>Usa os nomes das pastas virtuais em inglês.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableMirroredFolders</code></td><td>Desliga a sincronização de pastas do computador.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableMirroredMyDrive</code></td><td>Desliga o modo Espelho.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableOnboardingDialog</code></td><td>Pula o diálogo de primeiro uso.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableSSLValidation</code></td><td>Não valida o certificado TLS.</td><td><code>false</code></td></tr>
+<tr><td><code>DoNotShowNotifications</code></td><td>Lista de tipos de aviso desligados.</td><td>vazio</td></tr>
+<tr><td><code>ExcludedFolders</code></td><td>Pastas excluídas da indexação.</td><td>vazio</td></tr>
+<tr><td><code>IgnoreNodeModules</code></td><td>Ignora pastas <code>node_modules</code>.</td><td><code>false</code></td></tr>
+<tr><td><code>MinFreeDiskSpaceKBytes</code></td><td>Espaço livre mínimo no disco antes de parar de gravar.</td><td>512000 (500 MB)</td></tr>
+<tr><td><code>OpenOfficeFilesInDocs</code></td><td>Abre arquivos do Office no Google Docs.</td><td><code>true</code></td></tr>
+<tr><td><code>PauseSyncingOnMeteredConnection</code></td><td>Pausa a sincronização em conexão limitada.</td><td><code>false</code></td></tr>
+<tr><td><code>PromptToBackupDevices</code></td><td>Pergunta sobre o backup de dispositivos conectados.</td><td><code>true</code></td></tr>
+<tr><td><code>ProxyServer</code></td><td>Proxy manual (<code>http</code>, <code>https</code>, <code>socks5</code>, <code>socks5h</code>).</td><td>—</td></tr>
+<tr><td><code>SearchHotKey</code></td><td>Atalho global de pesquisa (portal XDG).</td><td>—</td></tr>
+<tr><td><code>ShowMountPointInSidebar</code></td><td>Mostra a pasta do Drive no painel do Dolphin.</td><td><code>true</code></td></tr>
+<tr><td><code>TrustSystemRootCerts</code></td><td>Confia nos certificados de raiz do sistema.</td><td><code>true</code></td></tr>
+<tr><td><code>TrustedRootCertsFile</code></td><td>Arquivo extra de certificados confiáveis.</td><td>—</td></tr>
+<tr><td><code>UITheme</code></td><td>Tema da interface.</td><td>—</td></tr>
+</tbody>
+</table>
+
+As políticas do sistema ficam em `/etc/gdrive-desktop-linux/policies.toml` e os padrões em
+`/etc/gdrive-desktop-linux/defaults.toml`. O arquivo do usuário tem prioridade sobre o padrão, e a
+política tem prioridade sobre os dois.
+
+<h2>17. Assistentes de IA (MCP)</h2>
+
+O programa `gdrive-desktop-linux-mcp` deixa um assistente compatível com o <strong>Model Context Protocol</strong>
+consultar e organizar o Drive pelo serviço do app, <strong>sem credencial própria</strong>. Veja a
+<a href="cli/">página da CLI</a> para o registro do servidor.
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-green">Reference</p>
+
+<h1>App features</h1>
+
+Everything GDrive Desktop does, organized by area. Each item here corresponds to an item of the
+official Windows application.
+
+<h2>1. The Drive folder</h2>
+
+The app mounts your Drive as a virtual folder via <strong>FUSE</strong>:
+
+<table class="docs-table">
+<thead><tr><th>Folder</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td><code>~/Google Drive/My Drive</code></td><td>Your whole My Drive.</td></tr>
+<tr><td><code>~/Google Drive/Shared drives</code></td><td>The shared drives of the account (only exists if the account has any).</td></tr>
+<tr><td><code>~/Google Drive/Computers</code></td><td>Copies of the synced computer folders.</td></tr>
+<tr><td><code>~/Google Drive/.Drive Trash</code></td><td>The Drive trash, read-only.</td></tr>
+<tr><td><code>~/Google Drive/Lost and Found</code></td><td>Conflicting versions and edits that have not uploaded.</td></tr>
+</tbody>
+</table>
+
+<h3>Stream mode (default)</h3>
+
+The files <strong>stay in the cloud</strong>. When you open one, only the chunks you read are downloaded — opening a
+2 GB video downloads the piece you are watching. This is the mode that saves the most space.
+
+<h3>Mirror mode</h3>
+
+In <strong>Preferences › Google Drive › Mirror files</strong>, your whole My Drive becomes a regular folder on the
+computer, available even without internet. Before you confirm, the window shows how much will be
+downloaded and how much free space there is.
+
+<strong>Stream the files again</strong> goes back to the previous mode once everything that changed has uploaded —
+and it can send the Mirror folder to the system trash, if you allow it.
+
+<div class="callout callout-note">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">No size limit</span>
+    <p>There is no 4 GB per-file limit like the Windows virtual drive has. Here the limit is the cloud's.</p>
+  </div>
+</div>
+
+<h2>2. On-demand files and offline</h2>
+
+- <strong>Available offline</strong> marks a file or folder to stay on disk.
+- <strong>Online only</strong> undoes it and frees the space right away, without touching what is open or has a
+  pending upload.
+- The state can be <strong>mixed</strong> (part on disk, part in the cloud) and the screen shows it.
+- The cache stores content in 1 MiB blocks, with windows that grow on sequential reads.
+
+The <strong>Offline files</strong> screen shows what is on the computer and the space used. Changing the cache folder
+in the settings moves the downloaded files to the new place <strong>without restarting the app</strong>, with a
+notice that shows the percentage.
+
+<h2>3. Synchronization</h2>
+
+- <strong>Automatic</strong> upload and download.
+- A <strong>queue that survives restarts</strong> and network drops: pending uploads stay on disk.
+- <strong>Conflicts</strong> kept in Lost and Found — never silently overwritten.
+- <strong>Trash</strong>: deleting from the Drive folder sends it to the Drive trash (30 days).
+- <strong>Bandwidth limits</strong> for upload and download.
+- <strong>Pause and resume</strong> at any time, from the tray or from the window.
+
+<div class="callout callout-tip">
+  <div>💡</div>
+  <div>
+    <span class="callout-title">Restoring from the trash</span>
+    <p>The <code>.Drive Trash</code> folder is read-only. To restore, drag the item into a Drive folder
+    (if a file with the same name already exists, both stay). The Dolphin trash also restores what it
+    sent there.</p>
+  </div>
+</div>
+
+<h2>4. Google Docs</h2>
+
+Docs, Sheets and Slides show up in the folder as pointers (`.gdoc`, `.gsheet`, `.gslides`) and
+<strong>open in the browser with a double click</strong>. Copying a pointer to another folder creates a Drive
+shortcut and warns that the original file stays in the source folder.
+
+<h2>5. Tray and main window</h2>
+
+The <strong>tray</strong> shows the sync state and gives you: pause/resume, search (also through the global
+shortcut, when the KDE portal allows it), the error list, offline files, preferences and quit.
+
+The <strong>main window</strong> has:
+
+<table class="docs-table">
+<thead><tr><th>Section</th><th>What it shows</th></tr></thead>
+<tbody>
+<tr><td>Header</td><td>The sync state, the last sync and the Pause/Resume button.</td></tr>
+<tr><td>Home</td><td>What needs attention, the offline files, what is shared with you and the sync state.</td></tr>
+<tr><td>Sync activity</td><td>What was uploaded, downloaded or trashed, with the menu of each row (open, copy link, share, cancel an upload).</td></tr>
+<tr><td>Connected folders</td><td>The computer folders that are being synced.</td></tr>
+<tr><td>Shared drives</td><td>Open each drive in the folder or on the web.</td></tr>
+<tr><td>Notifications</td><td>The history of warnings.</td></tr>
+<tr><td>More options</td><td>Offline files, error list, preferences, manage shared drives, disconnect all accounts and quit.</td></tr>
+</tbody>
+</table>
+
+<img src="../../assets/img/screenshots/janela-principal.png" alt="Main window of the app" class="mt-6 w-full rounded-xl border border-white/10" loading="lazy">
+
+<h2>6. First run and tour</h2>
+
+With no account connected, the app opens the <strong>first run</strong>: a Client ID guide with buttons that open
+each Google Cloud page and copy the values, the <strong>Summary</strong> of what was chosen and the <strong>tour</strong> of the
+main window (also available in the Preferences).
+
+<h2>7. Thumbnails</h2>
+
+Images show <strong>a thumbnail in Dolphin and other file managers</strong>, using Google's own thumbnails — without
+downloading the files. Thumbnails live in the standard freedesktop cache (`~/.cache/thumbnails`).
+
+<h2>8. Right-click menu</h2>
+
+On files and folders of the Drive the <strong>Google Drive</strong> submenu appears:
+
+- Open in the browser
+- Share
+- Copy link (the notice tells <strong>who can open it</strong>)
+- Manage versions
+- Add shortcut to Drive
+- Available offline / Online only (checked according to the current state)
+- New Google Doc, Sheet or Slides in the folder
+- Refresh the folder
+- Show the trash
+
+Outside the Drive folder the submenu does not show up. See the
+<a href="file-managers/">file managers page</a> for the details of each one.
+
+<h2>9. Sharing and managing versions</h2>
+
+The <strong>Share</strong> window brings people, roles (reader, commenter, editor), general access and the link. The
+<strong>Manage versions</strong> window lists the versions stored for a file, from the current one to the oldest, and
+lets you <strong>download</strong>, <strong>restore</strong> or <strong>keep forever</strong>.
+
+<div class="callout callout-note">
+  <div>ℹ️</div>
+  <div>
+    <span class="callout-title">Unavoidable difference</span>
+    <p>In the official app, versions live in a hidden folder. Here, the right-click menu opens the
+    “Manage versions” window.</p>
+  </div>
+</div>
+
+<h2>10. Accounts</h2>
+
+- Up to <strong>4 Google accounts</strong> at once, each with its own folder
+  (`~/Google Drive (<e-mail>)` from the second one on), all syncing at the same time.
+- Switch accounts from the account menu (the photo at the top of the window).
+- When access to one account expires, it shows up with <strong>Sign in again</strong>; the others keep going.
+- <strong>More options</strong> has <strong>Disconnect all accounts</strong>.
+- In <strong>Preferences › Google Drive › Change</strong> you change the folder of the shown account.
+
+<h2>11. Shared drives</h2>
+
+- They show up in each account folder and in a <strong>dedicated view</strong> in the main window.
+- The <strong>Manage shared drives</strong> window picks which drives show up and creates a new one.
+- Moving a file into a shared drive changes who can see it: the app warns <strong>after</strong> the move, because a
+  mounted folder cannot ask in the middle of a `mv`.
+- Shared drives stay in <strong>Stream</strong> even in Mirror mode, just like the official app.
+
+<h2>12. Computer folders and device backup</h2>
+
+In <strong>Preferences › My computer › Add folder</strong>, a folder on your computer is synced with
+`Computers/<this computer>` in the Drive, both ways. The tab suggests common folders (Documents,
+Pictures, Videos) so you can add them with one click.
+
+Nothing is deleted for good: what you delete on the computer goes to the Drive trash, and what leaves
+the Drive goes to the system trash. If many files disappear at once, the folder stops and asks first.
+
+<strong>USB drives and memory cards</strong>: when a device is connected, the app asks whether you want to back it
+up. The backup only uploads (nothing is deleted from the device nor from the Drive) and goes to
+`Computers/<this computer>/<device name>`.
+
+Network folders (NAS) <strong>cannot</strong> be synced: the app refuses network and FUSE volumes.
+
+<h2>13. Protection and recovery</h2>
+
+<h3>Suspicious activity</h3>
+
+If many files are rewritten in a way that resembles a file-encrypting virus, or renamed to encrypted
+extensions (`.locked` and similar), the app <strong>pauses the uploads of that account</strong> and warns you.
+Photos, videos, `.zip` and other already-compressed formats do not count.
+
+In the notice: <strong>Check</strong> opens the main window, <strong>I recognize this activity</strong> resumes and does not warn
+again for an hour, and <strong>Allow syncing</strong> resumes.
+
+<h3>Recovered items</h3>
+
+If the app data of an account gets damaged (power outage, faulty disk), it is kept in a `recovery`
+folder and the account is read from the Drive again. Edits that had not uploaded go to the
+<strong>Lost and Found</strong>, in the “Recovered &lt;date&gt;” folder. Nothing is re-uploaded on its own: move back
+to the Drive folder whatever you want to keep.
+
+<h2>14. Warnings and notifications</h2>
+
+The app warns about: missing permission, blocked account, nearly full storage, disk full, uploads
+stalled for days, recovered items, Drive limits, sign-in blocked by the organization, items moved where
+other people can see them, and new app versions. Each kind can be <strong>switched off</strong> in the notification
+preferences (`DoNotShowNotifications`).
+
+<h2>15. Diagnostics and feedback</h2>
+
+In <strong>More options</strong>:
+
+- <strong>Send feedback</strong> opens a pre-filled project issue in your browser with the version and the system.
+- <strong>Generate diagnostic information</strong> writes a `.tar.gz` to the Desktop with the logs, the system and
+  the preferences — <strong>with no tokens, passwords or full e-mails</strong>.
+- <strong>Enable detailed logging</strong> records more details for a day.
+- <strong>Reset local data</strong> wipes the app data of the account on this computer and reads it from the Drive
+  again, with the same login (only without pending uploads).
+
+With <strong>Send error reports automatically</strong> enabled, after a failure the app offers to open the issue with
+the report — you are the one who sends it.
+
+<h2>16. Preferences</h2>
+
+Preferences live in `~/.config/gdrive-desktop-linux/preferences.toml` and can be edited by hand (an
+unreadable file does not bring the app down: it is logged and the defaults are used until you fix it).
+
+<table class="docs-table">
+<thead><tr><th>Key</th><th>What it does</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td><code>AllowedAccountsPattern</code></td><td>Regex of the e-mails allowed to sign in.</td><td>—</td></tr>
+<tr><td><code>AutoStartOnLogin</code></td><td>Starts the tray with the system.</td><td><code>true</code></td></tr>
+<tr><td><code>AutomaticErrorReporting</code></td><td>Offers to send error reports automatically.</td><td><code>false</code></td></tr>
+<tr><td><code>BandwidthRxKBPS</code></td><td>Download limit, in KB/s.</td><td>—</td></tr>
+<tr><td><code>BandwidthTxKBPS</code></td><td>Upload limit, in KB/s.</td><td>—</td></tr>
+<tr><td><code>ContentCacheMaxKbytes</code></td><td>Maximum size of the content cache.</td><td>—</td></tr>
+<tr><td><code>ContentCachePath</code></td><td>Folder of the content cache.</td><td>—</td></tr>
+<tr><td><code>DefaultMountPoint</code></td><td>Folder where the Drive is mounted.</td><td>—</td></tr>
+<tr><td><code>DefaultWebBrowser</code></td><td>Browser used to open the login and the documents.</td><td>—</td></tr>
+<tr><td><code>DirectConnection</code></td><td>Connects directly, without proxy.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableAddAccount</code></td><td>Prevents adding accounts.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableCRLCheck</code></td><td>Skips the certificate revocation list check.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableExternalMediaSync</code></td><td>Turns off the backup of external devices.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableLocalizedVirtualFolders</code></td><td>Uses English names for the virtual folders.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableMirroredFolders</code></td><td>Turns off the syncing of computer folders.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableMirroredMyDrive</code></td><td>Turns off Mirror mode.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableOnboardingDialog</code></td><td>Skips the first run dialog.</td><td><code>false</code></td></tr>
+<tr><td><code>DisableSSLValidation</code></td><td>Skips TLS certificate validation.</td><td><code>false</code></td></tr>
+<tr><td><code>DoNotShowNotifications</code></td><td>List of warning kinds turned off.</td><td>empty</td></tr>
+<tr><td><code>ExcludedFolders</code></td><td>Folders excluded from indexing.</td><td>empty</td></tr>
+<tr><td><code>IgnoreNodeModules</code></td><td>Ignores <code>node_modules</code> folders.</td><td><code>false</code></td></tr>
+<tr><td><code>MinFreeDiskSpaceKBytes</code></td><td>Minimum free disk space before it stops writing.</td><td>512000 (500 MB)</td></tr>
+<tr><td><code>OpenOfficeFilesInDocs</code></td><td>Opens Office files in Google Docs.</td><td><code>true</code></td></tr>
+<tr><td><code>PauseSyncingOnMeteredConnection</code></td><td>Pauses syncing on a metered connection.</td><td><code>false</code></td></tr>
+<tr><td><code>PromptToBackupDevices</code></td><td>Asks about backing up connected devices.</td><td><code>true</code></td></tr>
+<tr><td><code>ProxyServer</code></td><td>Manual proxy (<code>http</code>, <code>https</code>, <code>socks5</code>, <code>socks5h</code>).</td><td>—</td></tr>
+<tr><td><code>SearchHotKey</code></td><td>Global search shortcut (XDG portal).</td><td>—</td></tr>
+<tr><td><code>ShowMountPointInSidebar</code></td><td>Shows the Drive folder in the Dolphin panel.</td><td><code>true</code></td></tr>
+<tr><td><code>TrustSystemRootCerts</code></td><td>Trusts the system root certificates.</td><td><code>true</code></td></tr>
+<tr><td><code>TrustedRootCertsFile</code></td><td>Extra file of trusted certificates.</td><td>—</td></tr>
+<tr><td><code>UITheme</code></td><td>Interface theme.</td><td>—</td></tr>
+</tbody>
+</table>
+
+System policies live in `/etc/gdrive-desktop-linux/policies.toml` and the defaults in
+`/etc/gdrive-desktop-linux/defaults.toml`. The user file wins over the default, and the policy wins
+over both.
+
+<h2>17. AI assistants (MCP)</h2>
+
+The `gdrive-desktop-linux-mcp` program lets an assistant compatible with the <strong>Model Context Protocol</strong>
+query and organize the Drive through the app service, <strong>with no credentials of its own</strong>. See the
+<a href="cli/">CLI page</a> for registering the server.
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>

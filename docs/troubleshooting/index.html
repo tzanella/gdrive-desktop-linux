@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solução de problemas · Documentação</title>
+<meta name="description" content="Registros, diagnóstico, conflitos, recuperação de dados e erros mais comuns do GDrive Desktop.">
+<link rel="icon" type="image/png" href="../../assets/img/icon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: {
+    sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    display: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+    mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+  },
+  colors: { gdrive: { blue: "#4285f4", green: "#34a853", yellow: "#fbbc04", red: "#ea4335", purple: "#a142f4" } },
+} } };
+</script>
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body class="docs-body" data-page="troubleshooting">
+
+<header id="docs-topbar" class="sticky top-0 z-40 border-b border-white/5 bg-[#0b0f19]/70 backdrop-blur-xl">
+  <div id="docs-header"></div>
+</header>
+
+<div class="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:px-8">
+
+  <aside class="hidden w-64 shrink-0 lg:block">
+    <div id="docs-sidebar"></div>
+  </aside>
+
+  <main class="min-w-0 flex-1">
+    <article id="article" class="article max-w-3xl">
+
+<div data-lang="pt-BR">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-red">Diagnóstico</p>
+
+<h1>Solução de problemas</h1>
+
+<h2>Onde ficam os registros</h2>
+
+O serviço roda como um serviço de usuário do systemd. Para ver o que aconteceu:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd</code></div>
+
+Os últimos logs, em tempo real:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd -f</code></div>
+
+Só desta semana, sem os logs antigos:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd --since "1 week ago"</code></div>
+
+<div class="callout callout-tip">
+  <div>🔍</div>
+  <div>
+    <span class="callout-title">Registro detalhado</span>
+    <p>Em <strong>Mais opções › Ativar o registro detalhado</strong> o app grava muito mais detalhe por
+    um dia (ou até você desativar). É o primeiro passo de qualquer relato de problema.</p>
+  </div>
+</div>
+
+<h2>Diagnóstico e feedback</h2>
+
+Em <strong>Mais opções</strong>:
+
+<table class="docs-table">
+<thead><tr><th>Ação</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td>Enviar feedback</td><td>Abre no navegador uma issue do projeto já preenchida com a versão e o sistema. Marque “Incluir informações de diagnóstico” para gerar o pacote e anexá-lo.</td></tr>
+<tr><td>Gerar informações de diagnóstico</td><td>Grava na Área de trabalho um <code>.tar.gz</code> com os registros, o sistema e as preferências — <strong>sem tokens, senhas nem e-mails inteiros</strong>.</td></tr>
+<tr><td>Ativar o registro detalhado</td><td>Grava mais detalhes nos registros por um dia.</td></tr>
+<tr><td>Redefinir os dados locais</td><td>Apaga os dados do app da conta neste computador e a lê de novo do Drive, com o mesmo login (só sem envios pendentes).</td></tr>
+</tbody>
+</table>
+
+Com <strong>Enviar relatórios de erro automaticamente</strong> ligado nas Preferências, depois de uma falha o app
+oferece abrir a issue com o relatório. Quem envia é você.
+
+<h2>Problemas mais comuns</h2>
+
+<table class="docs-table">
+<thead><tr><th>Sintoma</th><th>Causa provável e solução</th></tr></thead>
+<tbody>
+<tr><td>A pasta do Drive não aparece</td><td>O serviço não subiu. Veja <code>journalctl --user -u gdrive-desktop-linuxd</code>. Se o FUSE faltar, instale o <code>fuse3</code> e saia e entre de novo na sessão (o grupo <code>fuse</code> só vale na nova sessão).</td></tr>
+<tr><td>“O Google não verificou este app”</td><td>Esperado: o app não foi enviado ao Google para revisão. Clique em <strong>Avançado → Acessar (nome do app) (não seguro)</strong>. Veja o <a href="client-id/">guia do Client ID</a>.</td></tr>
+<tr><td>O login expira toda semana</td><td>O app do Google Cloud está “em teste”. Publique em produção e entre de novo.</td></tr>
+<tr><td><code>access_denied</code> no login</td><td>Você cancelou, ou a conta não está em <strong>Usuários de teste</strong>. Publique o app ou adicione a conta.</td></tr>
+<tr><td>Erro de SSL ao entrar</td><td>Proxy corporativo ou inspeção de TLS. Ajuste <code>ProxyServer</code> e <code>TrustedRootCertsFile</code> nas preferências.</td></tr>
+<tr><td>“Conta bloqueada” ou “login bloqueado pela organização”</td><td>Política do Google da sua empresa. Peça a liberação ao administrador; o app respeita a política e recusa a conta.</td></tr>
+<tr><td>Arquivos abrem vazios ou devagar</td><td>Primeira leitura de uma pasta grande: o app baixa os metadados de todo o Drive. Espere terminar a indexação (o estado aparece na janela principal).</td></tr>
+<tr><td>O disco encheu</td><td>O cache tem limite (<code>ContentCacheMaxKbytes</code>) e espaço livre mínimo (<code>MinFreeDiskSpaceKBytes</code>). Marque o que não precisa como “Somente on-line”.</td></tr>
+<tr><td>Os envios não saem</td><td>Verifique se a sincronização está pausada (bandeja ou <code>gdrive-desktop-linux status</code>) e se há limite de banda configurado.</td></tr>
+<tr><td>Um arquivo sumiu da pasta</td><td>Ele foi para a lixeira do Drive: <code>~/Google Drive/.Lixeira do Drive</code>. Para restaurar, arraste para uma pasta do Drive.</td></tr>
+<tr><td>O conflito não aparece em nenhum lugar</td><td>Está no Lost and Found: <code>gdrive-desktop-linux lost-and-found</code>.</td></tr>
+<tr><td>O menu do botão direito sumiu</td><td>Falta o pacote de Python do gerenciador ou ele não foi reiniciado. Veja a <a href="file-managers/">página de gerenciadores</a>.</td></tr>
+<tr><td>As miniaturas não aparecem</td><td>Reinicie o gerenciador e limpe o cache de miniaturas (<code>rm -rf ~/.cache/thumbnails/*</code>).</td></tr>
+</tbody>
+</table>
+
+<h2>Conflitos e Lost and Found</h2>
+
+Quando o mesmo arquivo é alterado nos dois lados, o app <strong>não escolhe por você</strong>: guarda as duas versões.
+
+<div class="code-block"><code>gdrive-desktop-linux lost-and-found</code></div>
+
+Os arquivos ficam na pasta `Lost and Found` dentro da pasta do Drive. O aviso <strong>Mover tudo para…</strong> leva
+tudo para uma pasta escolhida, sem sobrescrever nada.
+
+<h2>Itens recuperados</h2>
+
+Se os dados locais do app se danificarem (queda de energia, disco com defeito), o app os guarda numa
+pasta `recuperacao` e lê a conta de novo do Drive. As edições que ainda não tinham subido vão para o
+<strong>Lost and Found</strong>, na pasta “Recuperados &lt;data&gt;”.
+
+<strong>Nada é reenviado sozinho</strong>: mova de volta para a pasta do Drive o que quiser manter. Para refazer o
+caminho inteiro, use <strong>Mais opções › Redefinir os dados locais</strong> (desconecte antes, ou você perde os
+envios pendentes).
+
+<h2>Atividade suspeita (possível ransomware)</h2>
+
+O app pausa os envios da conta quando muitos arquivos são regravados de um jeito que lembra um vírus
+que cifra arquivos, ou renomeados para extensões de arquivo cifrado.
+
+No aviso:
+
+<table class="docs-table">
+<thead><tr><th>Botão</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td>Verificar</td><td>Abre a janela principal para você conferir a atividade.</td></tr>
+<tr><td>Eu reconheço esta atividade</td><td>Retoma e não avisa de novo por uma hora (quando você mesmo está cifrando arquivos, por exemplo).</td></tr>
+<tr><td>Permitir sincronização</td><td>Retoma a sincronização.</td></tr>
+</tbody>
+</table>
+
+Fotos, vídeos, `.zip` e outros formatos já comprimidos não contam. As versões anteriores continuam no
+Drive.
+
+<h2>Modo Espelho e espaço em disco</h2>
+
+Antes de confirmar o Espelho, a janela mostra <strong>quanto será baixado</strong> e <strong>quanto espaço livre</strong> existe.
+A troca é bloqueada enquanto houver envios pendentes.
+
+<strong>Fazer streaming dos arquivos</strong> volta ao modo Stream depois que tudo subir. O app pode mandar a pasta
+do Espelho para a lixeira do sistema, se você permitir.
+
+<h2>Backup de pendrives</h2>
+
+O backup só <strong>envia</strong> — nada é apagado do dispositivo nem do Drive. O destino é
+`Computadores/<este computador>/<nome do dispositivo>`. No fim, o aviso diz que dá para remover o
+dispositivo com segurança.
+
+Em <strong>Preferências › Meu computador</strong>, é possível fazer backup sempre que um dispositivo for conectado,
+ignorar um dispositivo específico ou desligar a pergunta.
+
+<h2>Perguntas rápidas</h2>
+
+<table class="docs-table">
+<thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead>
+<tbody>
+<tr><td>É oficial?</td><td>Não. É um cliente não oficial e de código aberto, que usa as APIs públicas do Google Drive. Não existe vínculo com o Google LLC nem endosso.</td></tr>
+<tr><td>É seguro?</td><td>O app só acessa a sua conta pela API pública do Google, com a sua autorização (OAuth), e o código é aberto para qualquer um conferir.</td></tr>
+<tr><td>Os arquivos ocupam espaço no meu disco?</td><td>No modo Stream, só o que você abre ou marca como “Disponível off-line” fica no disco.</td></tr>
+<tr><td>Posso usar sem internet?</td><td>Sim, com os arquivos que estão off-line ou já em cache. O que você alterar sem internet sobe quando a conexão voltar.</td></tr>
+<tr><td>Por que Rust?</td><td>Pela segurança de memória e pelo desempenho num serviço que fica rodando o tempo todo e lida com os seus arquivos.</td></tr>
+</tbody>
+</table>
+
+<h2>Ainda não resolveu?</h2>
+
+Abra uma issue no
+<a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">repositório</a>
+com o <strong>Gerar informações de diagnóstico</strong> anexado — o pacote tem os registros, o sistema e as
+preferências, sem nenhum token ou senha.
+
+</div>
+
+<div data-lang="en-US">
+
+<p class="text-sm uppercase tracking-[.16em] font-bold text-gdrive-red">Diagnostics</p>
+
+<h1>Troubleshooting</h1>
+
+<h2>Where the logs are</h2>
+
+The service runs as a systemd user service. To see what happened:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd</code></div>
+
+The latest logs, live:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd -f</code></div>
+
+Just this week, without the old logs:
+
+<div class="code-block"><code>journalctl --user -u gdrive-desktop-linuxd --since "1 week ago"</code></div>
+
+<div class="callout callout-tip">
+  <div>🔍</div>
+  <div>
+    <span class="callout-title">Detailed logging</span>
+    <p>With <strong>More options › Enable detailed logging</strong> the app records much more detail for
+    a day (or until you turn it off). It is the first step of any bug report.</p>
+  </div>
+</div>
+
+<h2>Diagnostics and feedback</h2>
+
+In <strong>More options</strong>:
+
+<table class="docs-table">
+<thead><tr><th>Action</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Send feedback</td><td>Opens a pre-filled project issue in your browser with the version and the system. Tick “Include diagnostic information” to generate the bundle and attach it.</td></tr>
+<tr><td>Generate diagnostic information</td><td>Writes a <code>.tar.gz</code> to the Desktop with the logs, the system and the preferences — <strong>with no tokens, passwords or full e-mails</strong>.</td></tr>
+<tr><td>Enable detailed logging</td><td>Records more details in the logs for a day.</td></tr>
+<tr><td>Reset local data</td><td>Wipes the app data of the account on this computer and reads it from the Drive again, with the same login (only without pending uploads).</td></tr>
+</tbody>
+</table>
+
+With <strong>Send error reports automatically</strong> enabled in the Preferences, after a failure the app offers to
+open the issue with the report. You are the one who sends it.
+
+<h2>Most common problems</h2>
+
+<table class="docs-table">
+<thead><tr><th>Symptom</th><th>Likely cause and solution</th></tr></thead>
+<tbody>
+<tr><td>The Drive folder does not show up</td><td>The service did not start. Check <code>journalctl --user -u gdrive-desktop-linuxd</code>. If FUSE is missing, install <code>fuse3</code> and log out and back in (the <code>fuse</code> group only applies on a new session).</td></tr>
+<tr><td>“Google hasn't verified this app”</td><td>Expected: the app was not submitted to Google for review. Click <strong>Advanced → Go to (app name) (unsafe)</strong>. See the <a href="client-id/">Client ID guide</a>.</td></tr>
+<tr><td>The login expires every week</td><td>Your Google Cloud app is in testing. Publish it to production and sign in again.</td></tr>
+<tr><td><code>access_denied</code> on login</td><td>You cancelled, or the account is not under <strong>Test users</strong>. Publish the app or add the account.</td></tr>
+<tr><td>SSL error while signing in</td><td>Corporate proxy or TLS inspection. Adjust <code>ProxyServer</code> and <code>TrustedRootCertsFile</code> in the preferences.</td></tr>
+<tr><td>“Account blocked” or “sign-in blocked by the organization”</td><td>A Google policy from your company. Ask your administrator for access; the app respects the policy and refuses the account.</td></tr>
+<tr><td>Files open empty or slowly</td><td>First read of a big folder: the app is downloading the metadata of the whole Drive. Wait for the indexing to finish (the state shows in the main window).</td></tr>
+<tr><td>The disk filled up</td><td>The cache has a limit (<code>ContentCacheMaxKbytes</code>) and a minimum free space (<code>MinFreeDiskSpaceKBytes</code>). Mark what you do not need as “Online only”.</td></tr>
+<tr><td>Uploads do not go out</td><td>Check whether the sync is paused (tray or <code>gdrive-desktop-linux status</code>) and whether a bandwidth limit is set.</td></tr>
+<tr><td>A file vanished from the folder</td><td>It went to the Drive trash: <code>~/Google Drive/.Drive Trash</code>. To restore, drag it into a Drive folder.</td></tr>
+<tr><td>A conflict shows up nowhere</td><td>It is in Lost and Found: <code>gdrive-desktop-linux lost-and-found</code>.</td></tr>
+<tr><td>The right-click menu disappeared</td><td>The file manager's Python package is missing, or it was not restarted. See the <a href="file-managers/">file managers page</a>.</td></tr>
+<tr><td>Thumbnails do not show up</td><td>Restart the file manager and clear the thumbnail cache (<code>rm -rf ~/.cache/thumbnails/*</code>).</td></tr>
+</tbody>
+</table>
+
+<h2>Conflicts and Lost and Found</h2>
+
+When the same file is changed on both sides, the app <strong>does not choose for you</strong>: it keeps both versions.
+
+<div class="code-block"><code>gdrive-desktop-linux lost-and-found</code></div>
+
+The files live in the `Lost and Found` folder inside the Drive folder. The <strong>Move everything to…</strong>
+notice takes them all to a folder you choose, without overwriting anything.
+
+<h2>Recovered items</h2>
+
+If the app's local data gets damaged (power outage, faulty disk), it is kept in a `recovery` folder and
+the account is read from the Drive again. Edits that had not uploaded go to the <strong>Lost and Found</strong>, in
+the “Recovered &lt;date&gt;” folder.
+
+<strong>Nothing is re-uploaded on its own</strong>: move back to the Drive folder whatever you want to keep. To redo
+the whole path, use <strong>More options › Reset local data</strong> (disconnect first, or you lose the pending
+uploads).
+
+<h2>Suspicious activity (possible ransomware)</h2>
+
+The app pauses the uploads of the account when many files are rewritten in a way that resembles a
+file-encrypting virus, or renamed to encrypted extensions.
+
+In the notice:
+
+<table class="docs-table">
+<thead><tr><th>Button</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Check</td><td>Opens the main window so you can review the activity.</td></tr>
+<tr><td>I recognize this activity</td><td>Resumes and does not warn again for an hour (when you are encrypting files yourself, for example).</td></tr>
+<tr><td>Allow syncing</td><td>Resumes the synchronization.</td></tr>
+</tbody>
+</table>
+
+Photos, videos, `.zip` and other already-compressed formats do not count. The previous versions stay on
+the Drive.
+
+<h2>Mirror mode and disk space</h2>
+
+Before you confirm the Mirror, the window shows <strong>how much will be downloaded</strong> and <strong>how much free
+space</strong> there is. The switch is blocked while there are pending uploads.
+
+<strong>Stream the files again</strong> goes back to Stream mode once everything has uploaded. The app can send the
+Mirror folder to the system trash, if you allow it.
+
+<h2>Device backup</h2>
+
+The backup only <strong>uploads</strong> — nothing is deleted from the device nor from the Drive. The destination is
+`Computers/<this computer>/<device name>`. At the end, the notice says you can safely remove the
+device.
+
+In <strong>Preferences › My computer</strong>, you can back up every time a device is connected, ignore a specific
+device, or turn the question off.
+
+<h2>Quick questions</h2>
+
+<table class="docs-table">
+<thead><tr><th>Question</th><th>Answer</th></tr></thead>
+<tbody>
+<tr><td>Is it official?</td><td>No. It is an unofficial, open source client that uses the public Google Drive APIs. There is no affiliation with Google LLC and no endorsement.</td></tr>
+<tr><td>Is it safe?</td><td>The app only reaches your account through Google's public API, with your own authorization (OAuth), and the code is open for anyone to review.</td></tr>
+<tr><td>Do the files take up space on my disk?</td><td>In Stream mode, only what you open or mark as “Available offline” stays on disk.</td></tr>
+<tr><td>Can I use it without internet?</td><td>Yes, with the files that are offline or already cached. What you change while offline uploads when the connection is back.</td></tr>
+<tr><td>Why Rust?</td><td>For memory safety and performance in a service that runs all the time and handles your files.</td></tr>
+</tbody>
+</table>
+
+<h2>Still stuck?</h2>
+
+Open an issue on the
+<a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">repository</a>
+with <strong>Generate diagnostic information</strong> attached — the bundle has the logs, the system and the
+preferences, with no token or password.
+
+</div>
+
+    </article>
+
+    <div id="docs-pager" class="mt-16"></div>
+
+    <footer class="mt-16 border-t border-white/10 pt-8 text-sm text-slate-600">
+      <p><strong>GDrive Desktop</strong> é um cliente não oficial do Google Drive para Linux, mantido por
+      <a href="https://github.com/tzanella" target="_blank" rel="noopener">Túlio Zanella</a>. Concepção e implementação
+      original por <a href="https://github.com/junior9283" target="_blank" rel="noopener">junior9283</a>.</p>
+      <p class="mt-3">Esta documentação descreve a versão <strong>1.2.5</strong>. O código-fonte está no
+      <a href="https://github.com/tzanella/gdrive-desktop-linux" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="../../">página do site</a> ·
+      <a href="https://github.com/tzanella/gdrive-desktop-linux/issues" target="_blank" rel="noopener">relatar um problema</a>.</p>
+      <p class="mt-3 text-xs">Este projeto não tem vínculo com o Google LLC nem é endossado por ele.
+      “Google Drive” e “Google Fotos” são marcas registradas do Google LLC, citadas apenas para indicar compatibilidade.</p>
+    </footer>
+  </main>
+
+  <aside class="hidden w-56 shrink-0 xl:block">
+    <div id="docs-toc" class="toc sticky top-28 text-sm"></div>
+  </aside>
+
+</div>
+
+<script src="../assets/docs.js"></script>
+</body>
+</html>
