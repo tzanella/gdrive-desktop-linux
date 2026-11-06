@@ -118,7 +118,7 @@
 .docs-table code { color: #8ab4f8; }
 
 /* ---------- Inline code ---------- */
-.article code:not(pre code) {
+.article code:not(pre code):not(.code-block code) {
   background: rgba(66, 133, 244, .12);
   border: 1px solid rgba(66, 133, 244, .22);
   color: #a8c7fa;
